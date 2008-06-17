@@ -2,11 +2,11 @@
 MXMLC=../bin/mxmlc
 OPTS=-use-network=false
 
-$MXMLC $OPTS Graphs.mxml
+$MXMLC $OPTS hello_flex.mxml
 
-mxmlFiles=`find */* -name '*.mxml' -print`
+#mxmlFiles=`find */* -name '*.mxml' -print`
 
-for mxml in ${mxmlFiles}; do
-        echo "building $mxml"
-        ($MXMLC $OPTS ${mxml})
-done
+#for mxml in ${mxmlFiles}; do
+        #echo "building $mxml"
+        #($MXMLC $OPTS ${mxml})
+#done
