@@ -13,6 +13,9 @@
 		[Bindable]
 		private var queryFeed:String;
 
+		[Bindable]
+		private var antonymsList:ArrayCollection;
+
 		private function lawl():void
 		{
 			queryFeed = "lawl";
@@ -35,7 +38,20 @@
                     {label:"U", data:"3"},
                     {label:"N", data:"4"}
                 ]);
+
                 secondList.dataProvider = new ArrayCollection([]);
+
+                synonymsList.dataProvider = new ArrayCollection([
+			{label:"lawl", data:"1"},
+			{label:"catz", data:"2"},
+			{label:"wham", data:"3"}
+			]);
+
+                antonymsList = new ArrayCollection([
+			{label:"unl337", data:"1"},
+			{label:"blanko el gato", data:"2"},
+			{label:"50 cent", data:"3"}
+			]);
             }
 
             // Variable to store original border color.
@@ -140,19 +156,18 @@
 
 
 	<mx:Canvas
-	cornerRadius="20"
+	cornerRadius="10"
 	borderStyle="solid"
 	backgroundColor="#A9A9A9"
 	width="550"
 	height="400"
 	>
 
-			<mx:Label text="  Query Builder:"/>
 			<mx:HorizontalList id="secondList" 
 liveScrolling="false" showScrollTips="true"
 			columnWidth="50"
 			paddingLeft="10"
-			width="545"
+			width="530"
 			height="350"
 			borderStyle="dotted"
 			backgroundColor="#A9A9A9"
@@ -170,12 +185,14 @@ liveScrolling="false" showScrollTips="true"
 	<!-- http://livedocs.adobe.com/flex/3/html/help.html?content=dragdrop_7.html -->
 	    <mx:HBox id="myHB">
 
+
 	      <mx:HorizontalList id="firstList" 
 			borderStyle="dotted"
 			backgroundColor="#A9A9A9"
 		    borderThickness="2"
 		    dragEnabled="true"
 		    dropEnabled="false"
+			dragMoveEnabled="false"
 			width="500"
 			height="50"
 			columnWidth="100"
@@ -195,15 +212,57 @@ liveScrolling="false" showScrollTips="true"
 	</mx:VBox>
 
 	<mx:VBox >
-		<mx:Spacer height="35"/>
+
+	<mx:Spacer height="1"/>
+
+        <mx:HBox>
+            <mx:Button label="Synonyms" click="accordion.selectedIndex=0;"/>
+            <mx:Button label="Antonyms" click="accordion.selectedIndex=1;"/>
+        </mx:HBox>
+
+	<mx:Spacer height="2"/>
+
 	<mx:Canvas
-	cornerRadius="10"
 	borderStyle="solid"
-	backgroundColor="#A9A9A9"
 	width="200"
 	height="390"
 	>
-		<mx:Label text="lawl"/>
+
+		<mx:Accordion id="accordion" width="100%" height="100%">
+		    <!-- Define each panel using a VBox container. -->
+		    <mx:VBox label="Synonyms" width="100%" id="VB1">
+			<mx:List id="synonymsList" width="100%"
+			borderStyle="dotted"
+		    borderThickness="2"
+		    dragEnabled="true"
+		    dropEnabled="false"
+			dragMoveEnabled="true"
+		    dragOver="dragOverHandler(event);"
+		    dragDrop="dragExitHandler(event);"
+		    dragExit="dragExitHandler(event);"
+			>
+			</mx:List>
+		    </mx:VBox>
+
+		    <mx:VBox label="Antonyms" width="100%" id="lawl2">
+			<mx:List width="100%"
+			dataProvider="{antonymsList}"
+			borderStyle="dotted"
+		    borderThickness="2"
+		    dragEnabled="true"
+		    dropEnabled="false"
+			dragMoveEnabled="true"
+		    dragOver="dragOverHandler(event);"
+		    dragDrop="dragExitHandler(event);"
+		    dragExit="dragExitHandler(event);"
+			>
+			</mx:List>
+		    </mx:VBox>
+
+
+
+		</mx:Accordion>
+
 	</mx:Canvas>
 	</mx:VBox>
 
