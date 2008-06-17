@@ -8,6 +8,23 @@
 	<mx:Script>
 		<![CDATA[
 
+		//----------------
+		// Double Click
+		//----------------
+
+            import mx.rpc.events.ResultEvent;
+
+
+		    private function appendText():void {
+			//var now:String = "lawlcatz";
+			var now:Object = lawl3.text;
+			secondList.dataProvider.addItem(now);
+		    }
+		//---------------
+		// End Double Click
+		//---------------
+
+
 		import mx.collections.ArrayCollection;
 
 		[Bindable]
@@ -165,7 +182,7 @@
 
 			<mx:HorizontalList id="secondList" 
 liveScrolling="false" showScrollTips="true"
-			columnWidth="50"
+			columnWidth="1000"
 			paddingLeft="10"
 			width="530"
 			height="350"
@@ -255,6 +272,8 @@ liveScrolling="false" showScrollTips="true"
 		    dragOver="dragOverHandler(event);"
 		    dragDrop="dragExitHandler(event);"
 		    dragExit="dragExitHandler(event);"
+			doubleClickEnabled="true"
+                        doubleClick="appendText(event.value);"
 			>
 			</mx:List>
 		    </mx:VBox>
@@ -265,5 +284,10 @@ liveScrolling="false" showScrollTips="true"
 
 	</mx:Canvas>
 	</mx:VBox>
+
+                <mx:Button id="button"
+                        label="[double] click me"
+			doubleClickEnabled="true"
+                        doubleClick="appendText(event);" />
 
 </mx:Application>
