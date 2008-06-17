@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="horizontal"
 	backgroundColor="black"
 	creationComplete="initApp();"
 	>
@@ -111,8 +112,9 @@
 
 
 	<!-- header area -->
+		<mx:VBox>
 	<mx:Canvas
-	cornerRadius="20"
+	cornerRadius="10"
 	borderStyle="solid"
 	backgroundColor="#A9A9A9"
 	width="550"
@@ -120,6 +122,7 @@
 	>
 		<mx:HBox height="50">
 			<mx:Spacer width="20"/>
+<!--
 			<mx:Button label="("/>
 			<mx:Button label=")"/>
 			<mx:Button label="U"/>
@@ -127,12 +130,14 @@
 
 			<mx:Spacer width="20"/>
 
+-->
 			<mx:Label text="Term: "/>
 			<mx:TextInput id="term"/>
 			<mx:Button label="Add" click="lawl()"/>
 
 		</mx:HBox>
 	</mx:Canvas>
+
 
 	<mx:Canvas
 	cornerRadius="20"
@@ -141,7 +146,6 @@
 	width="550"
 	height="400"
 	>
-		<mx:VBox>
 
 			<mx:Label text="  Query Builder:"/>
 			<mx:HorizontalList id="secondList" 
@@ -160,7 +164,6 @@ liveScrolling="false" showScrollTips="true"
 			dragDrop="dragExitHandler(event);"
 			dragExit="dragExitHandler(event);"/>
 
-		</mx:VBox>
 	</mx:Canvas>
 
 	<!-- Drag and Drop code -->
@@ -188,5 +191,20 @@ liveScrolling="false" showScrollTips="true"
 		click="initApp()"
 	    />
 	<!-- End Drag and Drop -->
+
+	</mx:VBox>
+
+	<mx:VBox >
+		<mx:Spacer height="35"/>
+	<mx:Canvas
+	cornerRadius="10"
+	borderStyle="solid"
+	backgroundColor="#A9A9A9"
+	width="200"
+	height="390"
+	>
+		<mx:Label text="lawl"/>
+	</mx:Canvas>
+	</mx:VBox>
 
 </mx:Application>
