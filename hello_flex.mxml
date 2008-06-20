@@ -15,9 +15,10 @@
             import mx.rpc.events.ResultEvent;
 
 
-		    private function appendText():void {
+		    private function appendText(e:Event):void {
 			//var now:String = "lawlcatz";
-			var now:Object = lawl3.text;
+			var now:Object = e.currentTarget.value;
+			//var now:Object = e.currentTarget.selectedIndex;
 			secondList.dataProvider.addItem(now);
 		    }
 		//---------------
@@ -50,24 +51,24 @@
 
             private function initApp():void {
                 firstList.dataProvider = new ArrayCollection([
-                    {label:"(", data:"1"},
-                    {label:")", data:"2"},
-                    {label:"U", data:"3"},
-                    {label:"N", data:"4"}
+                    {label:"(", data:"("},
+                    {label:")", data:")"},
+                    {label:"U", data:"U"},
+                    {label:"N", data:"N"}
                 ]);
 
                 secondList.dataProvider = new ArrayCollection([]);
 
                 synonymsList.dataProvider = new ArrayCollection([
-			{label:"lawl", data:"1"},
-			{label:"catz", data:"2"},
-			{label:"wham", data:"3"}
+			{label:"lawl", data:"lawl"},
+			{label:"catz", data:"catz"},
+			{label:"wham", data:"wham"}
 			]);
 
                 antonymsList = new ArrayCollection([
-			{label:"unl337", data:"1"},
-			{label:"blanko el gato", data:"2"},
-			{label:"50 cent", data:"3"}
+			{label:"unl337", data:"unl337"},
+			{label:"blanko el gato", data:"blanko el gato"},
+			{label:"50 cent", data:"50 cent"}
 			]);
             }
 
@@ -138,10 +139,22 @@
 		//------------------------
 
 
-
 		]]>
 	</mx:Script>
 
+    <mx:Glow id="glowImage" duration="1000" 
+        alphaFrom="1.0" alphaTo="0.3" 
+        blurXFrom="0.0" blurXTo="50.0" 
+        blurYFrom="0.0" blurYTo="50.0" 
+        color="0x00FF00"/>
+    <mx:Glow id="unglowImage" duration="1000" 
+        alphaFrom="0.3" alphaTo="1.0" 
+        blurXFrom="50.0" blurXTo="0.0" 
+        blurYFrom="50.0" blurYTo="0.0" 
+        color="0x0000FF"/>
+
+
+<!-- May contain some helpful code about wrapping our test arround the box.  http://livedocs.adobe.com/flex/3/html/help.html?content=behaviors_09.html -->
 
 
 	<!-- header area -->
@@ -182,7 +195,7 @@
 
 			<mx:HorizontalList id="secondList" 
 liveScrolling="false" showScrollTips="true"
-			columnWidth="1000"
+			columnWidth="50"
 			paddingLeft="10"
 			width="530"
 			height="350"
@@ -194,7 +207,10 @@ liveScrolling="false" showScrollTips="true"
 			dropEnabled="true"
 			dragOver="dragOverHandler(event);"
 			dragDrop="dragExitHandler(event);"
-			dragExit="dragExitHandler(event);"/>
+			dragExit="dragExitHandler(event);"
+			mouseDownEffect="{glowImage};"
+			mouseUpEffect="{unglowImage};"
+			/>
 
 	</mx:Canvas>
 
@@ -217,6 +233,8 @@ liveScrolling="false" showScrollTips="true"
 		    dragOver="dragOverHandler(event);"
 		    dragDrop="dragExitHandler(event);"
 		    dragExit="dragExitHandler(event);"
+			doubleClickEnabled="true"
+                        doubleClick="appendText(event);"
 		/>
 	    </mx:HBox>
 	    
@@ -257,6 +275,8 @@ liveScrolling="false" showScrollTips="true"
 		    dragOver="dragOverHandler(event);"
 		    dragDrop="dragExitHandler(event);"
 		    dragExit="dragExitHandler(event);"
+			doubleClickEnabled="true"
+                        doubleClick="appendText(event);"
 			>
 			</mx:List>
 		    </mx:VBox>
@@ -273,7 +293,7 @@ liveScrolling="false" showScrollTips="true"
 		    dragDrop="dragExitHandler(event);"
 		    dragExit="dragExitHandler(event);"
 			doubleClickEnabled="true"
-                        doubleClick="appendText(event.value);"
+                        doubleClick="appendText(event);"
 			>
 			</mx:List>
 		    </mx:VBox>
@@ -284,10 +304,5 @@ liveScrolling="false" showScrollTips="true"
 
 	</mx:Canvas>
 	</mx:VBox>
-
-                <mx:Button id="button"
-                        label="[double] click me"
-			doubleClickEnabled="true"
-                        doubleClick="appendText(event);" />
 
 </mx:Application>
