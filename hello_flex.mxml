@@ -48,7 +48,7 @@
 			if (event.menu != null) {
 				if(event.item.@data == "2A")
 				{
-					currentState='Register';
+					currentState='newConcept';
 				} else {
 			    Alert.show("Label: " + event.item.@label + "\n" + 
 				"Data: " + event.item.@data, "Clicked menu item");
@@ -227,84 +227,167 @@
 
 
 
-    <!-- Define one view state, in addition to the base state.-->
-    <mx:states>
-        <mx:State name="Register">
-            <mx:AddChild relativeTo="{loginForm}" position="lastChild">
-                <mx:target>
-                    <mx:FormItem id="confirm" label="Confirm:">
-                        <mx:TextInput/>
-                    </mx:FormItem>
-                </mx:target>
+	<!-- Define one view state, in addition to the base state.-->
+	<mx:states>
+		<mx:State name="newConcept">
+			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
+				<mx:target>
+					<mx:Form id="mainForm" width="100%">
+					</mx:Form>
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
+					<mx:FormItem id="confirm" label="Confirm:">
+					<mx:TextInput/>
+					</mx:FormItem>
+				</mx:target>
+			</mx:AddChild>
+			<!-- Now lets add the concept builder box - would be nice if we could modularize this... -->
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
+					<mx:Canvas
+					cornerRadius="10"
+					borderStyle="solid"
+					backgroundColor="#A9A9A9"
+					width="100%"
+					height="200"
+					>
+						<mx:HorizontalList id="secondList" 
+						liveScrolling="false" showScrollTips="true"
+						columnWidth="50"
+						paddingLeft="10"
+						width="100%"
+						height="100%"
+						borderStyle="dotted"
+						backgroundColor="#A9A9A9"
+						borderThickness="2"
+						dragEnabled="true"
+						dragMoveEnabled="true"
+						dropEnabled="true"
+						dragOver="dragOverHandler(event);"
+						dragDrop="dragExitHandler(event);"
+						dragExit="dragExitHandler(event);"
+						mouseDownEffect="{glowImage};"
+						mouseUpEffect="{unglowImage};"
+						/>
+					</mx:Canvas>
+				</mx:target>
+			</mx:AddChild>
 
-            </mx:AddChild>
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
+				<!-- Drag and Drop code:
+				 http://livedocs.adobe.com/flex/3/html/help.html?content=dragdrop_7.html -->
+					<mx:HBox id="myHB" width="100%">
+						<mx:HorizontalList id="firstList" 
+						borderStyle="dotted"
+						backgroundColor="#A9A9A9"
+						borderThickness="2"
+						dragEnabled="true"
+						dropEnabled="false"
+						dragMoveEnabled="false"
+						width="100%"
+						height="50"
+						columnWidth="100"
+						columnCount="3"
+						dragOver="dragOverHandler(event);"
+						dragDrop="dragExitHandler(event);"
+						dragExit="dragExitHandler(event);"
+						doubleClickEnabled="true"
+						doubleClick="appendText(event);"
+						/>
+					</mx:HBox>
+				<!-- End Drag and Drop -->
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
+					<mx:Button id="b1" label="Reset" click="initApp()"/>
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{col2}" position="firstChild">
+				<mx:target>
+					<mx:HBox>
+						<mx:Button label="Synonyms" click="accordion.selectedIndex=0;"/>
+						<mx:Button label="Antonyms" click="accordion.selectedIndex=1;"/>
+					</mx:HBox>
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{col2}" position="lastChild">
+				<mx:target>
+					<mx:Accordion id="accordion" width="10%" height="100%">
+					<!-- Define each panel using a VBox container. -->
+						<mx:VBox label="Synonyms" width="100%" id="VB1">
+							<mx:List id="synonymsList" width="100%"
+							borderStyle="dotted"
+							borderThickness="2"
+							dragEnabled="true"
+							dropEnabled="false"
+							dragMoveEnabled="true"
+							dragOver="dragOverHandler(event);"
+							dragDrop="dragExitHandler(event);"
+							dragExit="dragExitHandler(event);"
+							doubleClickEnabled="true"
+							doubleClick="appendText(event);"
+							>
+							</mx:List>
+						</mx:VBox>
+						<mx:VBox label="Antonyms" width="100%" id="lawl2">
+							<mx:List width="100%"
+							dataProvider="{antonymsList}"
+							borderStyle="dotted"
+							borderThickness="2"
+							dragEnabled="true"
+							dropEnabled="false"
+							dragMoveEnabled="true"
+							dragOver="dragOverHandler(event);"
+							dragDrop="dragExitHandler(event);"
+							dragExit="dragExitHandler(event);"
+							doubleClickEnabled="true"
+							doubleClick="appendText(event);"
+							>
+							</mx:List>
+						</mx:VBox>
+					</mx:Accordion>
+				</mx:target>
+			</mx:AddChild>
+			<mx:SetProperty target="{loginPanel}" name="title" value="New Concept"/>
+			<mx:RemoveChild target="{registerLink}"/>
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
+					<mx:LinkButton id="loginLink" label="Return to Login" click="currentState=''"/>
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
+					<mx:LinkButton id="loginButton" label="Add Concept" click="currentState=''"/>
+				</mx:target>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
 
-            <mx:AddChild relativeTo="{loginForm}" position="lastChild">
-		<mx:target>
-			<mx:Label text="lawl"/>
-		</mx:target>
-            </mx:AddChild>
+	<mx:transitions>
+		<!-- Define the transition from the base state to the Register state.-->
+		<mx:Transition id="toNewConcept" fromState="*" toState="newConcept">
+		    <mx:Sequence targets="{[loginPanel, registerLink, confirm, loginLink, spacer1]}">
+			<mx:RemoveChildAction/>
+			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
+			<mx:Resize target="{loginPanel}" heightTo="500" widthTo="700"/>
+			<mx:AddChildAction/>
+		    </mx:Sequence>
+		</mx:Transition>
 
-            <mx:SetProperty target="{loginPanel}" name="title" value="New Concept"/>
-            <mx:SetProperty target="{loginButton}" name="label" value="Add Concept"/>
-            <mx:SetStyle target="{loginButton}" name="color" value="blue"/>
-            <mx:RemoveChild target="{registerLink}"/>
-            <mx:AddChild relativeTo="{spacer1}" position="before">
-                <mx:target>
-                    <mx:LinkButton id="loginLink" label="Return to Login" click="currentState=''"/>
-                </mx:target>
-            </mx:AddChild>
-        </mx:State>
-   </mx:states>
-
-    <mx:transitions>
-        <!-- Define the transition from the base state to the Register state.-->
-        <mx:Transition id="toRegister" fromState="*" toState="Register">
-            <mx:Sequence targets="{[loginPanel, registerLink, confirm, loginLink, spacer1]}">
-                <mx:RemoveChildAction/>
-                <mx:SetPropertyAction target="{loginPanel}" name="title"/>
-                <mx:SetPropertyAction target="{loginButton}" name="label"/>
-                <mx:SetStyleAction target="{loginButton}" name="color"/>
-                <mx:Resize target="{loginPanel}"/>
-                <mx:AddChildAction/>
-            </mx:Sequence>
-        </mx:Transition>
-
-        <!-- Define the transition from the Register state to the base state.-->
-        <mx:Transition id="toDefault" fromState="Register" toState="*">
-            <mx:Sequence targets="{[loginPanel, registerLink, 
-                    confirm, loginLink, spacer1]}">
-                <mx:RemoveChildAction/>
-                <mx:SetPropertyAction target="{loginPanel}" name="title"/>
-                <mx:SetPropertyAction  target="{loginButton}" name="label"/>
-                <mx:SetStyleAction target="{loginButton}" name="color"/>
-                <mx:Resize target="{loginPanel}"/>
-                <mx:AddChildAction/>
-            </mx:Sequence>
-        </mx:Transition>
-    </mx:transitions>
-
-    <!-- Define a Panel container that defines the login form.-->
-    <mx:Panel title="Login" id="loginPanel" 
-        horizontalScrollPolicy="off" verticalScrollPolicy="off"
-        paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
-	
-        <mx:Form id="loginForm" >
-            <mx:FormItem label="Username:">
-                <mx:TextInput/>
-            </mx:FormItem>
-            <mx:FormItem label="Password:">
-                <mx:TextInput/>
-            </mx:FormItem>
-        </mx:Form>
-        <mx:ControlBar>
-            <mx:LinkButton id="registerLink"  label="Need to Register?"
-                click="currentState='Register'"/>
-            <mx:Spacer width="100%" id="spacer1"/>
-            <mx:Button label="Login" id="loginButton"/>
-        </mx:ControlBar>
-    </mx:Panel>
-
+		<!-- Define the transition from the Register state to the base state.-->
+		<mx:Transition id="toDefault" fromState="newConcept" toState="*">
+		    <mx:Sequence targets="{[loginPanel, registerLink, confirm, loginLink, spacer1]}">
+			<mx:RemoveChildAction/>
+			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
+			<mx:Resize target="{loginPanel}"/>
+			<mx:AddChildAction/>
+		    </mx:Sequence>
+		</mx:Transition>
+	</mx:transitions>
 
 
 
@@ -355,64 +438,23 @@
 	</mx:Canvas>
 
 
-	<mx:Canvas
-	cornerRadius="10"
-	borderStyle="solid"
-	backgroundColor="#A9A9A9"
-	width="550"
-	height="400"
-	>
 
-			<mx:HorizontalList id="secondList" 
-liveScrolling="false" showScrollTips="true"
-			columnWidth="50"
-			paddingLeft="10"
-			width="530"
-			height="350"
-			borderStyle="dotted"
-			backgroundColor="#A9A9A9"
-			borderThickness="2"
-			dragEnabled="true"
-			dragMoveEnabled="true"
-			dropEnabled="true"
-			dragOver="dragOverHandler(event);"
-			dragDrop="dragExitHandler(event);"
-			dragExit="dragExitHandler(event);"
-			mouseDownEffect="{glowImage};"
-			mouseUpEffect="{unglowImage};"
-			/>
+    <!-- Define a Panel container that defines the login form.-->
+    <mx:Panel title="Welcome - Please select an option from the menu above" id="loginPanel" 
+        horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="70"
+	layout="horizontal"
+        paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
 
-	</mx:Canvas>
+	<mx:VBox id="col1">
+		<mx:ControlBar>
+		    <mx:LinkButton id="registerLink"  label="" click="currentState='newConcept'"/>
+		    <mx:Spacer height="0" width="1" id="spacer1"/>
+		</mx:ControlBar>
+	</mx:VBox>
 
-	<!-- Drag and Drop code -->
-	<!-- http://livedocs.adobe.com/flex/3/html/help.html?content=dragdrop_7.html -->
-	    <mx:HBox id="myHB">
-
-
-	      <mx:HorizontalList id="firstList" 
-			borderStyle="dotted"
-			backgroundColor="#A9A9A9"
-		    borderThickness="2"
-		    dragEnabled="true"
-		    dropEnabled="false"
-			dragMoveEnabled="false"
-			width="500"
-			height="50"
-			columnWidth="100"
-			columnCount="3"
-		    dragOver="dragOverHandler(event);"
-		    dragDrop="dragExitHandler(event);"
-		    dragExit="dragExitHandler(event);"
-			doubleClickEnabled="true"
-                        doubleClick="appendText(event);"
-		/>
-	    </mx:HBox>
-	    
-	    <mx:Button id="b1" 
-		label="Reset"
-		click="initApp()"
-	    />
-	<!-- End Drag and Drop -->
+	<mx:VBox id="col2">
+	</mx:VBox>
+    </mx:Panel>
 
 	</mx:VBox>
 
@@ -420,59 +462,11 @@ liveScrolling="false" showScrollTips="true"
 
 	<mx:Spacer height="1"/>
 
-        <mx:HBox>
-            <mx:Button label="Synonyms" click="accordion.selectedIndex=0;"/>
-            <mx:Button label="Antonyms" click="accordion.selectedIndex=1;"/>
-        </mx:HBox>
-
-	<mx:Spacer height="2"/>
-
-	<mx:Canvas
-	borderStyle="solid"
-	width="200"
-	height="390"
-	>
-
-		<mx:Accordion id="accordion" width="100%" height="100%">
-		    <!-- Define each panel using a VBox container. -->
-		    <mx:VBox label="Synonyms" width="100%" id="VB1">
-			<mx:List id="synonymsList" width="100%"
-			borderStyle="dotted"
-		    borderThickness="2"
-		    dragEnabled="true"
-		    dropEnabled="false"
-			dragMoveEnabled="true"
-		    dragOver="dragOverHandler(event);"
-		    dragDrop="dragExitHandler(event);"
-		    dragExit="dragExitHandler(event);"
-			doubleClickEnabled="true"
-                        doubleClick="appendText(event);"
-			>
-			</mx:List>
-		    </mx:VBox>
-
-		    <mx:VBox label="Antonyms" width="100%" id="lawl2">
-			<mx:List width="100%"
-			dataProvider="{antonymsList}"
-			borderStyle="dotted"
-		    borderThickness="2"
-		    dragEnabled="true"
-		    dropEnabled="false"
-			dragMoveEnabled="true"
-		    dragOver="dragOverHandler(event);"
-		    dragDrop="dragExitHandler(event);"
-		    dragExit="dragExitHandler(event);"
-			doubleClickEnabled="true"
-                        doubleClick="appendText(event);"
-			>
-			</mx:List>
-		    </mx:VBox>
+    	<mx:Spacer height="2"/>
 
 
-
-		</mx:Accordion>
-
-	</mx:Canvas>
 	</mx:VBox>
+
+
 
 </mx:Application>
