@@ -2,11 +2,74 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 	layout="horizontal"
 	backgroundColor="black"
-	creationComplete="initApp();"
+	creationComplete="initApp();initCollections();"
 	>
 
 	<mx:Script>
 		<![CDATA[
+
+
+		//-----------------------------
+		//    Menu Code
+		//----------------------------
+
+		import mx.events.MenuEvent;
+		    import mx.controls.Alert;
+		    import mx.collections.*;
+
+		    [Bindable]
+		    public var menuBarCollection:XMLListCollection;
+	    
+		    private var menubarXML:XMLList =<>
+			<menuitem label="Engines">
+			    <menuitem label="SQLGen" data="1A"/>
+			    <menuitem label="Lucene" data="1B"/>
+			</menuitem>
+			<menuitem label="Concepts">
+			    <menuitem label="New" data="2A"/>
+			    <menuitem label="Edit" data="2B"/>
+			    <menuitem label="Delete" data="2C"/>
+			    <menuitem label="Import" data="2D"/>
+			    <menuitem label="Save" data="2E"/>
+			</menuitem>
+			<menuitem label="Something" data="M3"/>
+			</>
+			
+		    // Event handler to initialize the MenuBar control.
+		    private function initCollections():void {
+			menuBarCollection = new XMLListCollection(menubarXML);
+		    }
+		    
+		    // Event handler for the MenuBar control's change event.
+		    private function changeHandler(event:MenuEvent):void  {
+			// Only open the Alert for a selection in a pop-up submenu.
+			// The MenuEvent.menu property is null for a change event 
+			// dispatched by the menu bar.
+			if (event.menu != null) {
+			    Alert.show("Label: " + event.item.@label + "\n" + 
+				"Data: " + event.item.@data, "Clicked menu item");
+			}                    
+		    }
+
+		    // Event handler for the MenuBar control's itemRollOver event.
+		    private function rollOverHandler(event:MenuEvent):void {
+			//rollOverTextArea.text = "type: " + event.type + "\n";
+			//rollOverTextArea.text += "target menuBarIndex: " + event.index + "\n";
+		    }           
+
+		    // Event handler for the MenuBar control's itemClick event.
+		    private function itemClickHandler(event:MenuEvent):void {
+			//itemClickTextArea.text = "type: " + event.type + "\n";
+			//itemClickTextArea.text += "target menuBarIndex: " + event.index + "\n";
+		    }           
+
+
+		//----------------------------
+		//	END MENU CODE
+		//----------------------------
+
+
+
 
 		//----------------
 		// Double Click
@@ -53,8 +116,8 @@
                 firstList.dataProvider = new ArrayCollection([
                     {label:"(", data:"("},
                     {label:")", data:")"},
-                    {label:"U", data:"U"},
-                    {label:"N", data:"N"}
+                    {label:String.fromCharCode(0x222A), data:String.fromCharCode(0x222A)},
+                    {label:String.fromCharCode(0x2229), data:String.fromCharCode(0x2229)}
                 ]);
 
                 secondList.dataProvider = new ArrayCollection([]);
@@ -158,7 +221,15 @@
 
 
 	<!-- header area -->
+
+
+
+
+
 		<mx:VBox>
+
+
+
 	<mx:Canvas
 	cornerRadius="10"
 	borderStyle="solid"
@@ -166,8 +237,20 @@
 	width="550"
 	height="30"
 	>
-		<mx:HBox height="50">
+
+
+
+		<mx:HBox height="80">
 			<mx:Spacer width="20"/>
+
+
+<!-- Header Menu -->
+        <mx:MenuBar labelField="@label"  
+            dataProvider="{menuBarCollection}"
+            change="changeHandler(event);" 
+            itemClick="itemClickHandler(event);" 
+            itemRollOver="rollOverHandler(event);"/>        
+
 <!--
 			<mx:Button label="("/>
 			<mx:Button label=")"/>
@@ -177,7 +260,6 @@
 			<mx:Spacer width="20"/>
 
 -->
-			<mx:Label text="Term: "/>
 			<mx:TextInput id="term"/>
 			<mx:Button label="Add" click="lawl()"/>
 
