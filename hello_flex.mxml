@@ -32,7 +32,9 @@
 			    <menuitem label="Import" data="2D"/>
 			    <menuitem label="Save" data="2E"/>
 			</menuitem>
-			<menuitem label="Something" data="M3"/>
+			<menuitem label="Query">
+			    <menuitem label="Show Query" data="3A"/>
+			</menuitem>
 			</>
 			
 		    // Event handler to initialize the MenuBar control.
@@ -46,12 +48,16 @@
 			// The MenuEvent.menu property is null for a change event 
 			// dispatched by the menu bar.
 			if (event.menu != null) {
-				if(event.item.@data == "2A")
+				var theGoods:String;
+				theGoods = event.item.@data;
+				switch (theGoods)
 				{
-					currentState='newConcept';
-				} else {
-			    Alert.show("Label: " + event.item.@label + "\n" + 
-				"Data: " + event.item.@data, "Clicked menu item");
+					case "1A":	Alert.show("Now using SQLGen Engine");
+							break;
+					case "2A":	currentState='newConcept';
+							break;
+					case "3A":	currentState='showQuery';
+							break;
 				}
 			}                    
 		    }
@@ -105,7 +111,7 @@
 		private function lawl():void
 		{
 			queryFeed = "lawl";
-			secondList.dataProvider.addItem(term.text);
+			//secondList.dataProvider.addItem(term.text);
 		}
 
 		//------------------------
@@ -229,18 +235,25 @@
 
 	<!-- Define one view state, in addition to the base state.-->
 	<mx:states>
+		<mx:State name="conceptAdded">
+			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
+				<mx:target>
+					<mx:LinkButton id="viewQuery" label="View Query" click="currentState='showQuery'"/>
+				</mx:target>
+			</mx:AddChild>
+			<mx:SetProperty target="{loginPanel}" name="title" value="Concept Added!"/>
+		</mx:State>
+
+		<mx:State name="showQuery">
+			<mx:SetProperty target="{loginPanel}" name="title" value="Your Query"/>
+		</mx:State>
+
+
 		<mx:State name="newConcept">
 			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
 				<mx:target>
 					<mx:Form id="mainForm" width="100%">
 					</mx:Form>
-				</mx:target>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
-				<mx:target>
-					<mx:FormItem id="confirm" label="Confirm:">
-					<mx:TextInput/>
-					</mx:FormItem>
 				</mx:target>
 			</mx:AddChild>
 			<!-- Now lets add the concept builder box - would be nice if we could modularize this... -->
@@ -274,7 +287,6 @@
 					</mx:Canvas>
 				</mx:target>
 			</mx:AddChild>
-
 			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
 				<mx:target>
 				<!-- Drag and Drop code:
@@ -356,12 +368,7 @@
 			<mx:RemoveChild target="{registerLink}"/>
 			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
 				<mx:target>
-					<mx:LinkButton id="loginLink" label="Return to Login" click="currentState=''"/>
-				</mx:target>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
-				<mx:target>
-					<mx:LinkButton id="loginButton" label="Add Concept" click="currentState=''"/>
+					<mx:LinkButton id="loginButton" label="Add Concept" click="currentState='conceptAdded'"/>
 				</mx:target>
 			</mx:AddChild>
 		</mx:State>
@@ -370,7 +377,7 @@
 	<mx:transitions>
 		<!-- Define the transition from the base state to the Register state.-->
 		<mx:Transition id="toNewConcept" fromState="*" toState="newConcept">
-		    <mx:Sequence targets="{[loginPanel, registerLink, confirm, loginLink, spacer1]}">
+		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
 			<mx:RemoveChildAction/>
 			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
 			<mx:Resize target="{loginPanel}" heightTo="500" widthTo="700"/>
@@ -378,9 +385,29 @@
 		    </mx:Sequence>
 		</mx:Transition>
 
+		<!-- Define the transition from the adding concept state to the concept added state.-->
+		<mx:Transition id="toConceptAdded" fromState="*" toState="conceptAdded">
+		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
+			<mx:RemoveChildAction/>
+			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
+			<mx:Resize target="{loginPanel}" heightTo="100" widthTo="200"/>
+			<mx:AddChildAction/>
+		    </mx:Sequence>
+		</mx:Transition>
+
+		<!-- Define the transition for showQuery -->
+		<mx:Transition id="toShowQuery" fromState="*" toState="showQuery">
+		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
+			<mx:RemoveChildAction/>
+			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
+			<mx:Resize target="{loginPanel}" heightTo="400" widthTo="400"/>
+			<mx:AddChildAction/>
+		    </mx:Sequence>
+		</mx:Transition>
+
 		<!-- Define the transition from the Register state to the base state.-->
 		<mx:Transition id="toDefault" fromState="newConcept" toState="*">
-		    <mx:Sequence targets="{[loginPanel, registerLink, confirm, loginLink, spacer1]}">
+		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
 			<mx:RemoveChildAction/>
 			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
 			<mx:Resize target="{loginPanel}"/>
@@ -405,14 +432,14 @@
 	cornerRadius="10"
 	borderStyle="solid"
 	backgroundColor="#A9A9A9"
-	width="550"
+	width="100%"
 	height="30"
 	>
 
 
 
-		<mx:HBox height="80">
-			<mx:Spacer width="20"/>
+		<mx:HBox height="80" width="100%">
+			<mx:Spacer width="75%"/>
 
 
 <!-- Header Menu -->
@@ -430,10 +457,11 @@
 
 			<mx:Spacer width="20"/>
 
--->
 			<mx:TextInput id="term"/>
 			<mx:Button label="Add" click="lawl()"/>
 
+-->
+			<mx:Spacer width="75%"/>
 		</mx:HBox>
 	</mx:Canvas>
 
@@ -441,7 +469,7 @@
 
     <!-- Define a Panel container that defines the login form.-->
     <mx:Panel title="Welcome - Please select an option from the menu above" id="loginPanel" 
-        horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="70"
+        horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="40"
 	layout="horizontal"
         paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
 
