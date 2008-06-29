@@ -236,11 +236,18 @@
                         <mx:TextInput/>
                     </mx:FormItem>
                 </mx:target>
+
             </mx:AddChild>
+
+            <mx:AddChild relativeTo="{loginForm}" position="lastChild">
+		<mx:target>
+			<mx:Label text="lawl"/>
+		</mx:target>
+            </mx:AddChild>
+
             <mx:SetProperty target="{loginPanel}" name="title" value="New Concept"/>
             <mx:SetProperty target="{loginButton}" name="label" value="Add Concept"/>
-            <mx:SetStyle target="{loginButton}" 
-                name="color" value="blue"/>
+            <mx:SetStyle target="{loginButton}" name="color" value="blue"/>
             <mx:RemoveChild target="{registerLink}"/>
             <mx:AddChild relativeTo="{spacer1}" position="before">
                 <mx:target>
@@ -275,16 +282,13 @@
                 <mx:AddChildAction/>
             </mx:Sequence>
         </mx:Transition>
-	</mx:transitions>
+    </mx:transitions>
 
     <!-- Define a Panel container that defines the login form.-->
     <mx:Panel title="Login" id="loginPanel" 
         horizontalScrollPolicy="off" verticalScrollPolicy="off"
         paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
 	
-        <mx:Text width="100%" color="blue"
-            text="Click the 'Need to Register?' link to change state. Click the 'Return to Login' link to return to the base state."/>
-
         <mx:Form id="loginForm" >
             <mx:FormItem label="Username:">
                 <mx:TextInput/>
