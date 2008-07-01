@@ -103,15 +103,12 @@
 		import mx.collections.ArrayCollection;
 
 		[Bindable]
-		private var queryFeed:String;
-
-		[Bindable]
 		private var antonymsList:ArrayCollection;
 
 		private function lawl():void
 		{
-			queryFeed = "lawl";
-			//secondList.dataProvider.addItem(term.text);
+			query.dataProvider.addItem(term.text);
+			secondList.dataProvider.addItem(term.text);
 		}
 
 		//------------------------
@@ -133,6 +130,9 @@
 
                 secondList.dataProvider = new ArrayCollection([]);
 
+		query.dataProvider = new ArrayCollection([]);
+		//query.dataProvider = new HorizontalList();
+
                 synonymsList.dataProvider = new ArrayCollection([
 			{label:"lawl", data:"lawl"},
 			{label:"catz", data:"catz"},
@@ -145,6 +145,20 @@
 			{label:"50 cent", data:"50 cent"}
 			]);
             }
+
+		[Bindable]
+		public var queryArray:ArrayCollection;
+		//public var queryArray:Array;
+
+		public function getQuery():void {
+			;
+		}
+
+		private function setQuery():void {
+			//query.dataProvider.addItem(secondList);
+			currentState = 'showQuery';
+			//queryArray.addItem(secondList);
+		}
 
             // Variable to store original border color.
             private var tempBorderColor:uint;
@@ -245,6 +259,36 @@
 		</mx:State>
 
 		<mx:State name="showQuery">
+			<mx:AddChild relativeTo="{loginPanel}" position="lastChild">
+				<mx:target>
+					<mx:Canvas
+					cornerRadius="10"
+					borderStyle="solid"
+					backgroundColor="#A9A9A9"
+					width="100%"
+					height="200"
+					>
+						<mx:HorizontalList id="query" 
+						liveScrolling="false" showScrollTips="true"
+						columnWidth="50"
+						paddingLeft="10"
+						width="100%"
+						height="100%"
+						borderStyle="dotted"
+						backgroundColor="#A9A9A9"
+						borderThickness="2"
+						dragEnabled="true"
+						dragMoveEnabled="true"
+						dropEnabled="true"
+						dragOver="dragOverHandler(event);"
+						dragDrop="dragExitHandler(event);"
+						dragExit="dragExitHandler(event);"
+						mouseDownEffect="{glowImage};"
+						mouseUpEffect="{unglowImage};"
+						/>
+					</mx:Canvas>
+				</mx:target>
+			</mx:AddChild>
 			<mx:SetProperty target="{loginPanel}" name="title" value="Your Query"/>
 		</mx:State>
 
@@ -368,7 +412,18 @@
 			<mx:RemoveChild target="{registerLink}"/>
 			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
 				<mx:target>
-					<mx:LinkButton id="loginButton" label="Add Concept" click="currentState='conceptAdded'"/>
+					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="currentState='conceptAdded'"/>-->
+					<mx:LinkButton id="loginButton" label="Add Concept" click="setQuery()"/>
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
+					<mx:TextInput id="term"/>
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
+					<mx:Button label="Add" click="lawl()"/>
 				</mx:target>
 			</mx:AddChild>
 		</mx:State>
@@ -400,7 +455,7 @@
 		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
 			<mx:RemoveChildAction/>
 			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
-			<mx:Resize target="{loginPanel}" heightTo="400" widthTo="400"/>
+			<mx:Resize target="{loginPanel}" heightTo="400" widthTo="800"/>
 			<mx:AddChildAction/>
 		    </mx:Sequence>
 		</mx:Transition>
