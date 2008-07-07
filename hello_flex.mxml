@@ -107,7 +107,7 @@
 
 		private function lawl():void
 		{
-			query.dataProvider.addItem(term.text);
+			//query.dataProvider.addItem(term.text);
 			secondList.dataProvider.addItem(term.text);
 		}
 
@@ -227,6 +227,164 @@
 		//------------------------
 
 
+
+		//------------------------
+		// Start Tree Code
+		//------------------------
+	    import mx.events.DragEvent;
+            import mx.managers.DragManager;
+            import mx.core.DragSource;
+            import mx.core.UIComponent;
+            import mx.controls.Tree;
+            /**
+             * Called as soon as the dragProxy enters the target. You can add logic
+             * to determine if the target will accept the drop based on the
+             * dragInitiator, the data available in the dragSource.
+             * Here the drop is blindly accepted.
+             */
+
+            private function onDragEnter( event:DragEvent ) : void
+
+            {
+                DragManager.acceptDragDrop(UIComponent(event.currentTarget));
+            }
+            /**
+             * Called while the dragProxy is over the drop target. You can
+             * use this function to determine the type of feedback to show.
+             * Since the List is set to allow MOVE (the item is deleted
+             * once dropped), different feedback possibilities are given.
+             *
+             * Also, for this application, the Tree control node the dragProxy is
+             * over is selected. As the dragProxy moves, the Tree control's
+             * selection changes.
+             *
+             * For a bit more complication, the drop is being allowed
+             * only over nodes whose type is NOT 'state'.
+             * The feedback is removed.
+             */
+            private function onDragOver( event:DragEvent ) : void
+
+            {
+                var dropTarget:Tree = Tree(event.currentTarget);
+                var r:int = dropTarget.calculateDropIndex(event);
+                tree.selectedIndex = r;
+                var node:XML = tree.selectedItem as XML;
+                if( node.@type == "state" ) {
+
+                    DragManager.showFeedback(DragManager.NONE);
+                    return;
+                }
+                if (event.ctrlKey)
+
+                    DragManager.showFeedback(DragManager.COPY);
+                else if (event.shiftKey)
+                    DragManager.showFeedback(DragManager.LINK);
+                else {
+
+                    DragManager.showFeedback(DragManager.MOVE);
+                }
+            }
+            /**
+             * Called when the dragProxy is released
+             * over the drop target. The information in the dragSource
+             * is extracted and processed.
+             *
+             * The target node is determined and 
+            * all of the data selected (the List has allowMultipleSection
+            * set) is added.
+             */
+            private function onDragDrop( event:DragEvent ) : void
+
+            {
+                var ds:DragSource = event.dragSource;
+                var dropTarget:Tree = Tree(event.currentTarget);
+                var items:Array = ds.dataForFormat("items") as Array;
+                var r:int = tree.calculateDropIndex(event);
+                tree.selectedIndex = r;
+                var node:XML = tree.selectedItem as XML;
+                var p:*;
+                // if the selected node has children (it is type==city),
+
+                // then add the items at the beginning
+                if( tree.dataDescriptor.hasChildren(node) ) {
+                    p = node;
+                    r = 0;
+                } else {
+
+                    p = node.parent();
+                }
+                for(var i:Number=0; i < items.length; i++) {
+
+                    var insert:XML = <node />;
+                    insert.@label = items[i];
+                    insert.@type  = "restaurant";
+                    tree.dataDescriptor.addChildAt(p, insert, r+i);
+                }
+
+            }
+            /**
+             * Called when the drag operation completes, whether 
+             * successfully or not. The tree is cleared of its
+             * selection.
+             */
+            private function onDragComplete( event:DragEvent ) : void
+
+            {
+                tree.selectedIndex = -1;
+            }        
+
+
+	    import mx.collections.XMLListCollection;
+            
+            [Bindable]
+            private var company:XML =
+              <list>
+                <department title="Finance" code="200">
+                    <employee name="John H"/>
+                    <employee name="Sam K"/>
+                </department>
+                <department title="Operations" code="400">
+                    <employee name="Bill C"/>
+                    <employee name="Jill W"/>
+                </department>                    
+                <department title="Engineering" code="300">
+                    <employee name="Erin M"/>
+                    <employee name="Ann B"/>
+                </department>                                
+              </list>;
+
+            [Bindable]
+
+            private var companyData:XMLListCollection = new XMLListCollection(company.department);
+            
+            private function treeLabel(item:Object):String
+            {
+
+                var node:XML = XML(item);
+                if( node.localName() == "department" )
+
+                    return node.@title;
+                else
+                    return node.@name;
+            }
+
+            private function addEmployee():void
+            {
+		query.dataProvider.addItem(empName.text);
+                var newNode:XML = <employee/>;
+                newNode.@name = empName.text;
+                var dept:XMLList =company.department.(@title == "Operations");
+                if( dept.length() > 0 ) {
+
+                    dept[0].appendChild(newNode);
+                    empName.text = "";
+                }
+            }
+
+		//---------------------
+		// End Tree Code
+		//---------------------
+
 		]]>
 	</mx:Script>
 
@@ -266,26 +424,25 @@
 					borderStyle="solid"
 					backgroundColor="#A9A9A9"
 					width="100%"
-					height="200"
+					height="100%"
 					>
-						<mx:HorizontalList id="query" 
-						liveScrolling="false" showScrollTips="true"
-						columnWidth="50"
-						paddingLeft="10"
-						width="100%"
-						height="100%"
-						borderStyle="dotted"
-						backgroundColor="#A9A9A9"
-						borderThickness="2"
-						dragEnabled="true"
-						dragMoveEnabled="true"
-						dropEnabled="true"
-						dragOver="dragOverHandler(event);"
-						dragDrop="dragExitHandler(event);"
-						dragExit="dragExitHandler(event);"
-						mouseDownEffect="{glowImage};"
-						mouseUpEffect="{unglowImage};"
-						/>
+						<mx:Label text="Query" left="10" top="10"/>
+						<mx:Tree height="100%" width="186" left="10" top="30" bottom="10" id="tree"
+						    labelField="@label"
+						    dataProvider="{treeData.node}"
+						    dropEnabled="false"
+						    dragMoveEnabled="false"
+						    dragEnter="onDragEnter(event)"
+						    dragOver="onDragOver(event)"
+						    dragDrop="onDragDrop(event)">
+						</mx:Tree>    
+						<mx:Label text="Concepts" right="5" top="10"/>
+						<mx:List width="188" height="206" right="10" top="30" id="query"
+						    allowMultipleSelection="true"
+						    dragEnabled="true"
+						    dragMoveEnabled="true"
+						    dragComplete="onDragComplete(event)">
+						</mx:List>        
 					</mx:Canvas>
 				</mx:target>
 			</mx:AddChild>
@@ -294,6 +451,7 @@
 
 
 		<mx:State name="newConcept">
+
 			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
 				<mx:target>
 					<mx:Form id="mainForm" width="100%">
@@ -412,18 +570,18 @@
 			<mx:RemoveChild target="{registerLink}"/>
 			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
 				<mx:target>
+					<mx:HBox>
+						<mx:TextInput id="term"/><mx:Button label="Add" click="lawl()"/>
+					</mx:HBox>
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
+				<mx:target>
 					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="currentState='conceptAdded'"/>-->
-					<mx:LinkButton id="loginButton" label="Add Concept" click="setQuery()"/>
-				</mx:target>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
-				<mx:target>
-					<mx:TextInput id="term"/>
-				</mx:target>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
-				<mx:target>
-					<mx:Button label="Add" click="lawl()"/>
+					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="setQuery()"/>-->
+					<mx:HBox>
+						<mx:TextInput id="empName"/><mx:Button label="Add Concept!" click="addEmployee();setQuery()"/>
+					</mx:HBox>
 				</mx:target>
 			</mx:AddChild>
 		</mx:State>
@@ -550,6 +708,41 @@
 
 	</mx:VBox>
 
+<mx:XML id="treeData" xmlns="">
 
+        <root>
+            <node label="ALL" type="rootAll" data="rootAll">
+                <node label="Cars" type="rootCars" >
+                    <node label="Ford" type="car" />
+                    <node label="GMC" type="car" />
+                    <node label="Honda" type="car" />
+	            <node label="NOT" type="rootCars" >
+                        <node label="Saturn" type="car" />
+		    </node>
+                </node>
+            </node>
+            <node label="NOT" type="rootNot" data="rootNot">
+                <node label="Boats" type="rootBoats" >
+                    <node label="Speed Boats" type="speedBoats" />
+                </node>
+            </node>
+
+        </root>
+    </mx:XML>    
+
+<!--
+    <mx:Array id="listData">
+        <mx:String>Johnny Rocket's</mx:String>
+
+        <mx:String>Jet Pizza</mx:String>
+        <mx:String>Steve's Greek</mx:String>
+        <mx:String>Sonsie</mx:String>
+        <mx:String>The Border Cafe</mx:String>
+
+    </mx:Array>    
+    <mx:Tree id="tree2" top="72" left="50" dataProvider="{companyData}"
+        labelFunction="treeLabel"
+         height="224" width="179"/>
+        <mx:Button label="Add Operations Employee" click="addEmployee()"/><mx:TextInput id="empName"/>-->
 
 </mx:Application>
