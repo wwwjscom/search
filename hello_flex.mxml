@@ -56,6 +56,8 @@
 							break;
 					case "2A":	currentState='newConcept';
 							break;
+					case "2B":	currentState='editConcept';
+							break;
 					case "3A":	currentState='showQuery';
 							break;
 				}
@@ -93,7 +95,7 @@
 			//var now:String = "lawlcatz";
 			var now:Object = e.currentTarget.value;
 			//var now:Object = e.currentTarget.selectedIndex;
-			secondList.dataProvider.addItem(now);
+			//secondList.dataProvider.addItem(now);
 		    }
 		//---------------
 		// End Double Click
@@ -108,7 +110,7 @@
 		private function lawl():void
 		{
 			//query.dataProvider.addItem(term.text);
-			secondList.dataProvider.addItem(term.text);
+			//secondList.dataProvider.addItem(term.text);
 		}
 
 		//------------------------
@@ -119,19 +121,20 @@
             import mx.events.DragEvent;
             import mx.collections.ArrayCollection;
     
+		[Bindable]
+		public var conceptsArray:ArrayCollection = new ArrayCollection([]);
 
             private function initApp():void {
-                firstList.dataProvider = new ArrayCollection([
-                    {label:"(", data:"("},
-                    {label:")", data:")"},
-                    {label:String.fromCharCode(0x222A), data:String.fromCharCode(0x222A)},
-                    {label:String.fromCharCode(0x2229), data:String.fromCharCode(0x2229)}
-                ]);
+             //   firstList.dataProvider = new ArrayCollection([
+             //       {label:"(", data:"("},
+             //       {label:")", data:")"},
+             //       {label:String.fromCharCode(0x222A), data:String.fromCharCode(0x222A)},
+             //       {label:String.fromCharCode(0x2229), data:String.fromCharCode(0x2229)}
+             //   ]);
 
-                secondList.dataProvider = new ArrayCollection([]);
+                //secondList.dataProvider = new ArrayCollection([]);
 
-		query.dataProvider = new ArrayCollection([]);
-		//query.dataProvider = new HorizontalList();
+		//query.dataProvider = new ArrayCollection([]);
 
                 synonymsList.dataProvider = new ArrayCollection([
 			{label:"lawl", data:"lawl"},
@@ -370,7 +373,14 @@
 
             private function addEmployee():void
             {
-		query.dataProvider.addItem(empName.text);
+		var term:XML = 
+			<list>
+				<concept title="empName.text"/>
+			</list>;
+            	var termData:XMLListCollection = new XMLListCollection(term.concept);
+
+		conceptsArray.addItem(termData);
+		//query.dataProvider.addItem(empName.text);
                 var newNode:XML = <employee/>;
                 newNode.@name = empName.text;
                 var dept:XMLList =company.department.(@title == "Operations");
@@ -387,6 +397,7 @@
 
 		]]>
 	</mx:Script>
+
 
     <mx:Glow id="glowImage" duration="1000" 
         alphaFrom="1.0" alphaTo="0.3" 
@@ -437,7 +448,8 @@
 						    dragDrop="onDragDrop(event)">
 						</mx:Tree>    
 						<mx:Label text="Concepts" right="5" top="10"/>
-						<mx:List width="188" height="206" right="10" top="30" id="query"
+						<mx:List width="188" height="206" right="10" top="30" id="concepts"
+							dataProvider="{conceptsArray}"
 						    allowMultipleSelection="true"
 						    dragEnabled="true"
 						    dragMoveEnabled="true"
@@ -449,6 +461,34 @@
 			<mx:SetProperty target="{loginPanel}" name="title" value="Your Query"/>
 		</mx:State>
 
+		<!-- Edit Concept State -->
+		<mx:State name="editConcept">
+			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
+				<mx:target>
+					<mx:Form id="editConceptForm" width="100%">
+							<mx:TextArea text="{conceptsArray.toString()}"/>
+						        <mx:ComboBox id="editThisConcept" dataProvider="{conceptsArray}" width="150"/>
+							<mx:Button label="Edit Concept" click="currentState='editingConcept'"/>
+					</mx:Form>
+				</mx:target>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
+				<mx:target>
+					<mx:Form id="editingConceptForm" width="100%">
+							<mx:TextArea width="100%"
+							text="{editThisConcept.selectedItem.data}">
+							</mx:TextArea>
+							<mx:Button label="Update" click="currentState='editingConcept'"/>
+					</mx:Form>
+				</mx:target>
+			</mx:AddChild>
+			<mx:SetProperty target="{loginPanel}" name="title" value="Editing Concept"/>
+		</mx:State>
+
+		<!-- Edit Concept State -->
+		<mx:State name="editingConcept">
+			<mx:SetProperty target="{loginPanel}" name="title" value="Editing Unique Concept"/>
+		</mx:State>
 
 		<mx:State name="newConcept">
 
@@ -468,56 +508,11 @@
 					width="100%"
 					height="200"
 					>
-						<mx:HorizontalList id="secondList" 
-						liveScrolling="false" showScrollTips="true"
-						columnWidth="50"
-						paddingLeft="10"
-						width="100%"
-						height="100%"
-						borderStyle="dotted"
-						backgroundColor="#A9A9A9"
-						borderThickness="2"
-						dragEnabled="true"
-						dragMoveEnabled="true"
-						dropEnabled="true"
-						dragOver="dragOverHandler(event);"
-						dragDrop="dragExitHandler(event);"
-						dragExit="dragExitHandler(event);"
-						mouseDownEffect="{glowImage};"
-						mouseUpEffect="{unglowImage};"
-						/>
+						<mx:TextArea width="100%" height="100%" id="secondList">
+						    <mx:text>
+						    </mx:text>
+						</mx:TextArea>
 					</mx:Canvas>
-				</mx:target>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
-				<mx:target>
-				<!-- Drag and Drop code:
-				 http://livedocs.adobe.com/flex/3/html/help.html?content=dragdrop_7.html -->
-					<mx:HBox id="myHB" width="100%">
-						<mx:HorizontalList id="firstList" 
-						borderStyle="dotted"
-						backgroundColor="#A9A9A9"
-						borderThickness="2"
-						dragEnabled="true"
-						dropEnabled="false"
-						dragMoveEnabled="false"
-						width="100%"
-						height="50"
-						columnWidth="100"
-						columnCount="3"
-						dragOver="dragOverHandler(event);"
-						dragDrop="dragExitHandler(event);"
-						dragExit="dragExitHandler(event);"
-						doubleClickEnabled="true"
-						doubleClick="appendText(event);"
-						/>
-					</mx:HBox>
-				<!-- End Drag and Drop -->
-				</mx:target>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
-				<mx:target>
-					<mx:Button id="b1" label="Reset" click="initApp()"/>
 				</mx:target>
 			</mx:AddChild>
 			<mx:AddChild relativeTo="{col2}" position="firstChild">
@@ -570,13 +565,6 @@
 			<mx:RemoveChild target="{registerLink}"/>
 			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
 				<mx:target>
-					<mx:HBox>
-						<mx:TextInput id="term"/><mx:Button label="Add" click="lawl()"/>
-					</mx:HBox>
-				</mx:target>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
-				<mx:target>
 					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="currentState='conceptAdded'"/>-->
 					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="setQuery()"/>-->
 					<mx:HBox>
@@ -594,6 +582,26 @@
 			<mx:RemoveChildAction/>
 			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
 			<mx:Resize target="{loginPanel}" heightTo="500" widthTo="700"/>
+			<mx:AddChildAction/>
+		    </mx:Sequence>
+		</mx:Transition>
+
+		<!-- Define the transition for edit a concept.-->
+		<mx:Transition id="toEditConcept" fromState="*" toState="editConcept">
+		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
+			<mx:RemoveChildAction/>
+			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
+			<mx:Resize target="{loginPanel}" heightTo="200" widthTo="500"/>
+			<mx:AddChildAction/>
+		    </mx:Sequence>
+		</mx:Transition>
+
+		<!-- Define the transition for editing a concept.-->
+		<mx:Transition id="toEditingConcept" fromState="*" toState="editingConcept">
+		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
+			<mx:RemoveChildAction/>
+			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
+			<mx:Resize target="{loginPanel}" heightTo="200" widthTo="300"/>
 			<mx:AddChildAction/>
 		    </mx:Sequence>
 		</mx:Transition>
@@ -646,7 +654,7 @@
 	borderStyle="solid"
 	backgroundColor="#A9A9A9"
 	width="100%"
-	height="30"
+	height="90"
 	>
 
 
@@ -656,6 +664,7 @@
 
 
 <!-- Header Menu -->
+            <mx:Image id="phoneImage" source="@Embed('IRLabsLogoTrans.gif')" />
         <mx:MenuBar labelField="@label"  
             dataProvider="{menuBarCollection}"
             change="changeHandler(event);" 
@@ -681,7 +690,7 @@
 
 
     <!-- Define a Panel container that defines the login form.-->
-    <mx:Panel title="Welcome - Please select an option from the menu above" id="loginPanel" 
+    <mx:Panel title="" id="loginPanel" 
         horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="40"
 	layout="horizontal"
         paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
