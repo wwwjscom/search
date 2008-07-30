@@ -10,4 +10,4 @@ $MXMLC $OPTS hello_flex.mxml
         #echo "building $mxml"
         #($MXMLC $OPTS ${mxml})
 #done
-cp hello_flex.swf /Applications/MAMP/htdocs/ir/search
+cp hello_flex.swf ir-search.php /Applications/MAMP/htdocs/ir/search

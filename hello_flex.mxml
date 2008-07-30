@@ -95,7 +95,7 @@
 			//var now:String = "lawlcatz";
 			var now:Object = e.currentTarget.value;
 			//var now:Object = e.currentTarget.selectedIndex;
-			//secondList.dataProvider.addItem(now);
+			//newConceptString.dataProvider.addItem(now);
 		    }
 		//---------------
 		// End Double Click
@@ -118,7 +118,7 @@
 		private function lawl():void
 		{
 			//query.dataProvider.addItem(term.text);
-			//secondList.dataProvider.addItem(term.text);
+			//newConceptString.dataProvider.addItem(term.text);
 		}
 
 		//------------------------
@@ -140,7 +140,7 @@
              //       {label:String.fromCharCode(0x2229), data:String.fromCharCode(0x2229)}
              //   ]);
 
-                //secondList.dataProvider = new ArrayCollection([]);
+                //newConceptString.dataProvider = new ArrayCollection([]);
 
 		//query.dataProvider = new ArrayCollection([]);
 
@@ -166,9 +166,9 @@
 		}
 
 		private function setQuery():void {
-			//query.dataProvider.addItem(secondList);
+			//query.dataProvider.addItem(newConceptString);
 			currentState = 'showQuery';
-			//queryArray.addItem(secondList);
+			//queryArray.addItem(newConceptString);
 		}
 
             // Variable to store original border color.
@@ -424,8 +424,7 @@
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="e4x"
     	url="http://localhost:8888/ir/search/ir-search.php?function=addConcept" useProxy="false">
 	    <mx:request xmlns="">
-	        <zipcode>60707</zipcode>
-	        <pounds>10</pounds>
+	        <input>{newConceptString.text}</input>
 	    </mx:request>
 	</mx:HTTPService>
 
@@ -539,7 +538,7 @@
 					width="100%"
 					height="200"
 					>
-						<mx:TextArea width="100%" height="100%" id="secondList">
+						<mx:TextArea width="100%" height="100%" id="newConceptString">
 						    <mx:text>
 						    </mx:text>
 						</mx:TextArea>
