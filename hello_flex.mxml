@@ -379,25 +379,25 @@
                     return node.@name;
             }
 
-            private function addEmployee():void
-            {
-		var term:XML = 
-			<list>
-				<concept title="empName.text"/>
-			</list>;
-            	var termData:XMLListCollection = new XMLListCollection(term.concept);
+           // private function addEmployee():void
+           // {
+	   //     var term:XML = 
+	   //     	<list>
+	   //     		<concept title="empName.text"/>
+	   //     	</list>;
+           // 	var termData:XMLListCollection = new XMLListCollection(term.concept);
 
-		conceptsArray.addItem(termData);
-		//query.dataProvider.addItem(empName.text);
-                var newNode:XML = <employee/>;
-                newNode.@name = empName.text;
-                var dept:XMLList =company.department.(@title == "Operations");
-                if( dept.length() > 0 ) {
+	   //     conceptsArray.addItem(termData);
+	   //     //query.dataProvider.addItem(empName.text);
+           //     var newNode:XML = <employee/>;
+           //     newNode.@name = empName.text;
+           //     var dept:XMLList =company.department.(@title == "Operations");
+           //     if( dept.length() > 0 ) {
 
-                    dept[0].appendChild(newNode);
-                    empName.text = "";
-                }
-            }
+           //         dept[0].appendChild(newNode);
+           //         empName.text = "";
+           //     }
+           // }
 
 		//---------------------
 		// End Tree Code
@@ -411,7 +411,8 @@
 
 	        public function handleXML(event:ResultEvent):void
             {
-                shippingInfo = event.result.option as XMLList;
+                //shippingInfo = event.result.option as XMLList;
+                shippingInfo = event.result.file as XMLList;
             }
 
 	        public function handleFault(event:FaultEvent):void
@@ -422,9 +423,19 @@
 	</mx:Script>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="e4x"
-    	url="http://localhost:8888/ir/search/ir-search.php?function=addConcept" useProxy="false">
+    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
+		<func>addConcept</func>
 	        <input>{newConceptString.text}</input>
+		<name>{newConceptName.text}</name>
+	    </mx:request>
+	</mx:HTTPService>
+
+   <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="getAllConcepts" resultFormat="e4x"
+    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>getAllConcepts</func>
+	        <name>wwwjscom</name>
 	    </mx:request>
 	</mx:HTTPService>
 
@@ -479,12 +490,14 @@
 						</mx:Tree>    
 						<mx:Label text="Concepts" right="5" top="10"/>
 						<mx:List width="188" height="206" right="10" top="30" id="concepts"
-							dataProvider="{conceptsArray}"
+							dataProvider="{shippingInfo}"
 						    allowMultipleSelection="true"
 						    dragEnabled="true"
 						    dragMoveEnabled="true"
 						    dragComplete="onDragComplete(event)">
 						</mx:List>        
+
+					<mx:LinkButton id="getALL" label="getALL" click="getAllConcepts.send()"/>
 					</mx:Canvas>
 				</mx:target>
 			</mx:AddChild>
@@ -598,15 +611,9 @@
 					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="currentState='conceptAdded'"/>-->
 					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="setQuery()"/>-->
 					<mx:HBox>
-						<mx:TextInput id="empName"/><mx:Button label="Add Concept!" click="addConcept.send();"/>
+						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();"/>
 							<mx:TextArea text="{shippingInfo}"/>
-	<mx:DataGrid
-		dataProvider="{shippingInfo}"
-		x="80" y="141" width="262" height="92" id="shippingOptionsList" editable="false" enabled="true">
-	    <mx:columns>
-	        <mx:DataGridColumn headerText="Service" dataField="price" />
-	    </mx:columns>
-	</mx:DataGrid>
+
 					</mx:HBox>
 				</mx:target>
 			</mx:AddChild>

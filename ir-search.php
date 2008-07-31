@@ -1,18 +1,19 @@
 <?
 
-$function = $_GET['function'];
-//$function = "addConcept"; // NEED TO BE CHANGES LATER
-
-$input = $_GET['input'];
+@$func		= $_GET['func'];
+@$input 	= $_GET['input'];
+@$name 		= $_GET['name'];
 
 $funcClass = new Functions;
+$funcClass->setName($name);
 $funcClass->setInput($input);
-$funcClass->run($function);
+$funcClass->run($func);
 
 
 class Functions {
 
-	private $input = null;
+	private $input 	= null;
+	private $name 	= null;
 
 	public function run($funcName)
 	{
@@ -21,7 +22,52 @@ class Functions {
 			case "addConcept":
 				$this->addConcept();
 				break;
+			case "getAllConcepts":
+				// In this case, name represents the persons username.
+				$this->getAllConcepts($this->name);
+				break;
 		}
+	}
+
+	/* Returns all concepts that a given user has created over time.
+	 * This list is returned to flex and the filenames are displayed
+	 * to the user so that they can drag-drop them when building queries. */
+	public function getAllConcepts($name)
+	{
+		//define the path as relative
+		$path = "concepts/".$name."";
+
+		//using the opendir function
+		$dir_handle = @opendir($path) or die("Unable to open $path");
+
+		//echo "Directory Listing of $path<br/>";
+
+		print "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
+		print "<files>";
+		//running the while loop
+		while ($file = readdir($dir_handle)) 
+		{
+			if($file == "." || $file == "..")
+			{
+				// Do nothing - don't want to display these.
+			} else {
+			   print "<file>$file</file>";
+			}
+		}
+		print "</files>";
+
+		//closing the directory
+		closedir($dir_handle);
+	}
+
+	public function setName ($name)
+	{
+		$this->name = $name;
+	}
+
+	public function getName()
+	{
+		return $this->name;
 	}
 
 	public function setInput($input)
@@ -52,28 +98,24 @@ class Functions {
 		$c_all 		= null;
 		$p_type 	= null;
 		$logicArray	= $this->getLogicArray();
+
 		$xmlArray[] = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 		$xmlArray[] = "<concept>\n";
-		//$xmlArray[] = "<concept>";
 
 		for($i = 0; $inputArrayLength > $i; $i++)
 		{
 			$c = $inputArray[$i];	
-			//echo $c;
 			
 			/* If c is an open bracket */
 			if($c == "(" || $c == "[")
 			{
 				if($c_all != null)
 				{
-					//$xmlArray[] = "$c_all</term>";
 					$xmlArray[] = "$c_all</term>\n";
 				} else if($term_i != null) {
-					//$xmlArray[] = "$term_i</term>";
 					$xmlArray[] = "$term_i</term>\n";
 				}
 
-				//$xmlArray[] = "<bracket>";
 				$xmlArray[] = "<bracket>\n";
 				$term_i = null;
 				$c_all 	= null;
@@ -83,14 +125,11 @@ class Functions {
 
 				if($c_all != null)
 				{
-					//$xmlArray[] = "$c_all</term>";
 					$xmlArray[] = "$c_all</term>\n";
 				} else if($term_i != null) {
-					//$xmlArray[] = "$term_i</term>";
 					$xmlArray[] = "$term_i</term>\n";
 				}
 				
-				//$xmlArray[] = "</bracket>";
 				$xmlArray[] = "</bracket>\n";
 				$term_i = null;
 				$c_all 	= null;
@@ -103,10 +142,8 @@ class Functions {
 				
 				if($c_all != null || $term_i != null)
 				{
-					//$xmlArray[] = "$term_i</term>";
 					$xmlArray[] = "$term_i</term>\n";
 				}
-				//$xmlArray[] = "<logic>$c_all</logic>";
 				$xmlArray[] = "<logic>$c_all</logic>\n";
 
 				$p_type = "Logic";
@@ -142,34 +179,18 @@ class Functions {
 
 		if($c_all != null)
 		{
-			//$xmlArray[] = "$c_all</term>";
 			$xmlArray[] = "$c_all</term>\n";
 		}
 
-		//$xmlArray[] = "</concept>";
 		$xmlArray[] = "</concept>\n";
 
 		$xmlString = $this->errorCorrect($xmlArray);
-/*
-$xml = new SimpleXMLElement($xmlString);
-echo $xml->asXML(); 
-echo $xml->concept[0];
-$dom = new DomDocument();
-$dom->load($xmlString);
-print $dom->saveXML();
 
-*/
-$myFile = 'concepts/lawl.xml';
-$fh = fopen($myFile, 'w') or die("can't open file");
-fwrite($fh, $xmlString);
-fclose($fh);
+		$myFile = "concepts/".$this->getName().".xml";
+		$fh = fopen($myFile, 'w') or die("can't open file");
+		fwrite($fh, $xmlString);
+		fclose($fh);
 		
-		/*
-		foreach($fixedXMLArray as $key => $term)
-		{
-			print $term;
-		}
-		*/
 	}
 
 	public function errorCorrect($xmlArray)
@@ -179,13 +200,10 @@ fclose($fh);
 		for($i = 0; sizeOf($xmlArray) > $i; $i++)
 		{
 			if($prev_term == "<term>" && $xmlArray[$i] == "</term>\n")	
-			//if($prev_term == "<term>" && $xmlArray[$i] == "</term>")	
 			{
 				$j = $i-1;
 				$xmlArray[$j] = "";
 				$xmlArray[$i] = "";
-				//unset($j);
-				//unset($i);
 			}
 			$prev_term = $xmlArray[$i];
 		}
