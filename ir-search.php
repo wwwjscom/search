@@ -26,7 +26,27 @@ class Functions {
 				// In this case, name represents the persons username.
 				$this->getAllConcepts($this->name);
 				break;
+			case "getConceptData":
+				// In this case, name represents the username/filename.xml
+				//$this->getConceptData($this->getName());
+				$this->getConceptData($this->name);
+				break;
 		}
+	}
+
+	/* Returns the concept data.  This allows the user to edit it.  However,
+	 * currently we display the XML to the user, we will need to write a funcion
+	 * which will convert the XML back to plain text.  Or can we just use the DOM
+	 * or simpleXML object in php...?  Hmmm.... */
+	public function getConceptData($filePathAndName)
+	{
+		//$filePathAndName = $_GET['name'];
+		if(!$xml=simplexml_load_file("concepts/wwwjscom/".$filePathAndName.".xml")){
+			trigger_error('Error reading XML file',E_USER_ERROR);
+		}
+
+		/* Need to write a function that'll reverse the process and not show the XML to the user */
+		echo $xml->asXML();	
 	}
 
 	/* Returns all concepts that a given user has created over time.
@@ -51,6 +71,7 @@ class Functions {
 			{
 				// Do nothing - don't want to display these.
 			} else {
+				$file = substr($file,0,strlen($file)-4);
 			   print "<file>$file</file>";
 			}
 		}

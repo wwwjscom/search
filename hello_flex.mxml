@@ -407,20 +407,42 @@
 		import mx.rpc.events.FaultEvent;
 
 	   [Bindable]
-	   private var shippingInfo:XMLList;
+	   private var allConcepts:XMLList;
+	   private var conceptData:XMLList;
 
 	        public function handleXML(event:ResultEvent):void
             {
-                //shippingInfo = event.result.option as XMLList;
-                shippingInfo = event.result.file as XMLList;
+                //allConcepts = event.result.option as XMLList;
+                allConcepts = event.result.file as XMLList;
             }
 
 	        public function handleFault(event:FaultEvent):void
 	        {
 	           Alert.show(event.fault.faultString, "Error");
 	        }
+
+		public function handleXMLUpdateEditForm(event:ResultEvent):void
+		{
+			//conceptData = event.result as XMLList;
+			editThisConceptField.text = event.result.toString();
+			//lawlcats.text = editThisConcept.selectedLabel;
+		}
+
+		public function preAuthorize():void
+		{
+			preAuthorizeField.text = editThisConcept.selectedLabel;
+		}
+		//<name>{editThisConcept.selectedLabel}</name>
 		]]>
 	</mx:Script>
+
+   <mx:HTTPService result="handleXMLUpdateEditForm(event);" fault="handleFault(event);" id="getConceptData" resultFormat="text"
+    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>getConceptData</func>
+		<name>{preAuthorizeField.text}</name>
+	    </mx:request>
+	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="e4x"
     	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
@@ -490,7 +512,7 @@
 						</mx:Tree>    
 						<mx:Label text="Concepts" right="5" top="10"/>
 						<mx:List width="188" height="206" right="10" top="30" id="concepts"
-							dataProvider="{shippingInfo}"
+							dataProvider="{allConcepts}"
 						    allowMultipleSelection="true"
 						    dragEnabled="true"
 						    dragMoveEnabled="true"
@@ -509,8 +531,8 @@
 			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
 				<mx:target>
 					<mx:Form id="editConceptForm" width="100%">
-							<mx:TextArea text="{conceptsArray.toString()}"/>
-						        <mx:ComboBox id="editThisConcept" dataProvider="{conceptsArray}" width="150"/>
+							<mx:TextArea id="preAuthorizeField" text="{conceptsArray.toString()}"/>
+						        <mx:ComboBox id="editThisConcept" dataProvider="{allConcepts}" width="150" change="preAuthorize();getConceptData.send()"/>
 							<mx:Button label="Edit Concept" click="currentState='editingConcept'"/>
 					</mx:Form>
 				</mx:target>
@@ -518,7 +540,7 @@
 			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
 				<mx:target>
 					<mx:Form id="editingConceptForm" width="100%">
-							<mx:TextArea width="100%"
+							<mx:TextArea id="editThisConceptField" width="100%"
 							text="{editThisConcept.selectedItem.data}">
 							</mx:TextArea>
 							<mx:Button label="Update" click="currentState='editingConcept'"/>
@@ -528,7 +550,7 @@
 			<mx:SetProperty target="{loginPanel}" name="title" value="Editing Concept"/>
 		</mx:State>
 
-		<!-- Edit Concept State -->
+		<!-- Editing Concept State -->
 		<mx:State name="editingConcept">
 			<mx:SetProperty target="{loginPanel}" name="title" value="Editing Unique Concept"/>
 		</mx:State>
@@ -612,7 +634,7 @@
 					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="setQuery()"/>-->
 					<mx:HBox>
 						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();"/>
-							<mx:TextArea text="{shippingInfo}"/>
+							<mx:TextArea text="{allConcepts}"/>
 
 					</mx:HBox>
 				</mx:target>
