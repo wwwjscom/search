@@ -437,7 +437,7 @@
 	</mx:Script>
 
    <mx:HTTPService result="handleXMLUpdateEditForm(event);" fault="handleFault(event);" id="getConceptData" resultFormat="text"
-    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+    	method="GET" url="http://e4.ftpaccess.cc/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getConceptData</func>
 		<name>{preAuthorizeField.text}</name>
@@ -445,7 +445,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="e4x"
-    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+    	method="GET" url="http://e4.ftpaccess.cc/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>addConcept</func>
 	        <input>{newConceptString.text}</input>
@@ -454,7 +454,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="getAllConcepts" resultFormat="e4x"
-    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+    	method="GET" url="http://e4.ftpaccess.cc/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getAllConcepts</func>
 	        <name>wwwjscom</name>
