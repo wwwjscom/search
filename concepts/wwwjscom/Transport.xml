@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<concept>
+<term>Boats</term>
+<logic>AND</logic>
+<term>Cars</term>
+</concept>

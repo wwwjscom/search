@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<concept>
+<term>Boats</term>
+<logic>AND</logic>
+<term>Cars</term>
+</concept>
+
+
+
+Name: <br />
+<b>Warning</b>:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: concepts/wwwjscom/:1: parser error : Document is empty in <b>/Applications/MAMP/htdocs/ir/search/ir-search.php</b> on line <b>45</b><br />
+<br />
+<b>Warning</b>:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]:  in <b>/Applications/MAMP/htdocs/ir/search/ir-search.php</b> on line <b>45</b><br />
+<br />
+<b>Warning</b>:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: ^ in <b>/Applications/MAMP/htdocs/ir/search/ir-search.php</b> on line <b>45</b><br />
+<br />
+<b>Warning</b>:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: concepts/wwwjscom/:1: parser error : Start tag expected, '&lt;' not found in <b>/Applications/MAMP/htdocs/ir/search/ir-search.php</b> on line <b>45</b><br />
+<br />
+<b>Warning</b>:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]:  in <b>/Applications/MAMP/htdocs/ir/search/ir-search.php</b> on line <b>45</b><br />
+<br />
+<b>Warning</b>:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: ^ in <b>/Applications/MAMP/htdocs/ir/search/ir-search.php</b> on line <b>45</b><br />
+<br />
+<b>Fatal error</b>:  Error reading XML file in <b>/Applications/MAMP/htdocs/ir/search/ir-search.php</b> on line <b>46</b><br />
