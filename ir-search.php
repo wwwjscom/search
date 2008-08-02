@@ -31,6 +31,9 @@ class Functions {
 				//$this->getConceptData($this->getName());
 				$this->getConceptData($this->name);
 				break;
+			case "javaTest":
+				$java = shell_exec('java JavaLink1');
+				echo($java);
 		}
 	}
 
