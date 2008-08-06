@@ -437,7 +437,7 @@
 	</mx:Script>
 
    <mx:HTTPService result="handleXMLUpdateEditForm(event);" fault="handleFault(event);" id="getConceptData" resultFormat="text"
-    	method="GET" url="http://e4.ftpaccess.cc/ir/search/ir-search.php" useProxy="false">
+    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getConceptData</func>
 		<name>{preAuthorizeField.text}</name>
@@ -445,7 +445,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="e4x"
-    	method="GET" url="http://e4.ftpaccess.cc/ir/search/ir-search.php" useProxy="false">
+    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>addConcept</func>
 	        <input>{newConceptString.text}</input>
@@ -454,7 +454,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="getAllConcepts" resultFormat="e4x"
-    	method="GET" url="http://e4.ftpaccess.cc/ir/search/ir-search.php" useProxy="false">
+    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getAllConcepts</func>
 	        <name>wwwjscom</name>
@@ -531,20 +531,20 @@
 			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
 				<mx:target>
 					<mx:Form id="editConceptForm" width="100%">
-							<mx:TextArea id="preAuthorizeField" text="{conceptsArray.toString()}"/>
+							<mx:Label text="{conceptsArray.toString()}" id="preAuthorizeField" left="10" top="10"/>
 						        <mx:ComboBox id="editThisConcept" dataProvider="{allConcepts}" width="150" change="preAuthorize();getConceptData.send()"/>
-							<mx:Button label="Edit Concept" click="currentState='editingConcept'"/>
+							<mx:TextArea id="editThisConceptField" width="400" height="300"
+							text="{editThisConcept.selectedItem.data}">
+							</mx:TextArea>
+							<mx:Button label="Update" click="currentState='editingConcept'"/>
+
 					</mx:Form>
 				</mx:target>
 			</mx:AddChild>
 			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
 				<mx:target>
 					<mx:Form id="editingConceptForm" width="100%">
-							<mx:TextArea id="editThisConceptField" width="100%"
-							text="{editThisConcept.selectedItem.data}">
-							</mx:TextArea>
-							<mx:Button label="Update" click="currentState='editingConcept'"/>
-					</mx:Form>
+												</mx:Form>
 				</mx:target>
 			</mx:AddChild>
 			<mx:SetProperty target="{loginPanel}" name="title" value="Editing Concept"/>
@@ -658,7 +658,7 @@
 		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
 			<mx:RemoveChildAction/>
 			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
-			<mx:Resize target="{loginPanel}" heightTo="200" widthTo="500"/>
+			<mx:Resize target="{loginPanel}" heightTo="450" widthTo="500"/>
 			<mx:AddChildAction/>
 		    </mx:Sequence>
 		</mx:Transition>

@@ -43,13 +43,13 @@ class Functions {
 	 * or simpleXML object in php...?  Hmmm.... */
 	public function getConceptData($filePathAndName)
 	{
-		//$filePathAndName = $_GET['name'];
-		if(!$xml=simplexml_load_file("concepts/wwwjscom/".$filePathAndName.".xml")){
-			trigger_error('Error reading XML file',E_USER_ERROR);
-		}
 
-		/* Need to write a function that'll reverse the process and not show the XML to the user */
-		echo $xml->asXML();	
+		$myFile = "concepts/".$this->getName().".xml";
+
+		$fh = fopen($myFile, 'r') or die("can't open file");
+		$contents = fread($fh, filesize($myFile));
+		echo $contents;
+		fclose($fh);
 	}
 
 	/* Returns all concepts that a given user has created over time.
