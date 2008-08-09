@@ -430,7 +430,7 @@
 
 		public function preAuthorize():void
 		{
-			preAuthorizeField.text = editThisConcept.selectedLabel;
+			editThisConceptName.text = editThisConcept.selectedLabel;
 		}
 		//<name>{editThisConcept.selectedLabel}</name>
 		]]>
@@ -440,11 +440,11 @@
     	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getConceptData</func>
-		<name>{preAuthorizeField.text}</name>
+		<name>{editThisConceptName.text}</name>
 	    </mx:request>
 	</mx:HTTPService>
 
-   <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="e4x"
+   <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="text"
     	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>addConcept</func>
@@ -459,7 +459,26 @@
 		<func>getAllConcepts</func>
 	        <name>wwwjscom</name>
 	    </mx:request>
-	</mx:HTTPService>
+    </mx:HTTPService>
+
+   <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="updateConceptData" resultFormat="text"
+    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>updateConceptData</func>
+		<name>{editThisConceptName.text}</name>
+		<input>{editThisConceptField.text}</input>
+	    </mx:request>
+    </mx:HTTPService>
+
+   <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="query" resultFormat="text"
+    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>query</func>
+		<input>{treeData.node}</input>
+	    </mx:request>
+    </mx:HTTPService>
+
+
 
 
     <mx:Glow id="glowImage" duration="1000" 
@@ -510,6 +529,7 @@
 						    dragOver="onDragOver(event)"
 						    dragDrop="onDragDrop(event)">
 						</mx:Tree>    
+					<mx:LinkButton id="QueryNOW" label="queryNOW" click="query.send()"/>
 						<mx:Label text="Concepts" right="5" top="10"/>
 						<mx:List width="188" height="206" right="10" top="30" id="concepts"
 							dataProvider="{allConcepts}"
@@ -531,12 +551,12 @@
 			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
 				<mx:target>
 					<mx:Form id="editConceptForm" width="100%">
-							<mx:Label text="{conceptsArray.toString()}" id="preAuthorizeField" left="10" top="10"/>
+							<mx:Label text="{conceptsArray.toString()}" id="editThisConceptName" left="10" top="10"/>
 						        <mx:ComboBox id="editThisConcept" dataProvider="{allConcepts}" width="150" change="preAuthorize();getConceptData.send()"/>
 							<mx:TextArea id="editThisConceptField" width="400" height="300"
 							text="{editThisConcept.selectedItem.data}">
 							</mx:TextArea>
-							<mx:Button label="Update" click="currentState='editingConcept'"/>
+							<mx:Button label="Update" click="updateConceptData.send();Alert.show('Updated');"/>
 
 					</mx:Form>
 				</mx:target>

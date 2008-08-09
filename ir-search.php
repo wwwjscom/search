@@ -34,7 +34,80 @@ class Functions {
 			case "javaTest":
 				$java = shell_exec('java JavaLink1');
 				echo($java);
+				break;
+			case "updateConceptData":
+				$this->updateConceptData($this->name);
+				break;
+			case "query":
+				//$this->setName("QUERY.xml");
+				//$this->addConcept();
+				$this->query();
+				break;
 		}
+	}
+
+	public function query()
+	{
+		$myXML = $this->getInput();
+
+		$myXML = $this->fileRead("concepts/wwwjscom/INPUT_QUERY.XML");
+
+
+		$xml = simplexml_load_string($myXML);
+		//echo $xml->getName() . "<br />";
+		$input = null;
+
+		foreach($xml->children() as $child)
+		{
+			$label = $child->attributes()->label;
+
+			/* This will have children */
+			if($label == "ALL" || $label == "NOT")
+			{
+				foreach($child->children() as $subchild)
+				{
+					
+				}
+			}
+
+			$input = $input."".$child->getName() . ": " . $child . "<br />";
+			$input = $input."".$child->attributes()->label . ": " . $child . "<br />";
+		}
+
+
+		$this->setInput($input);
+		$this->setName("QUERY");
+		$this->addConcept();
+	}
+
+	public function loop($xml, $isNot = false)
+	{
+		if($isNot)
+			$input .= "NOT ";
+
+		$input .= "{";
+
+		foreach($xml->children() as $child)
+		{
+			$label = $child->attributes()->label;
+		
+			if($label == "ALL")
+				$this->loop($child);
+			else if($label == "NOT")
+				$this->loop($child, true);
+
+			$input .= $child->getName();
+		}
+		$input .= "}";
+	}
+
+	public function updateConceptData($fileName)
+	{
+		$path = "concepts/wwwjscom";
+		$pathAndFile = $path."/".$fileName.".xml";
+		unlink($pathAndFile);
+
+		$this->addConcept();
 	}
 
 	/* Returns the concept data.  This allows the user to edit it.  However,
@@ -43,13 +116,9 @@ class Functions {
 	 * or simpleXML object in php...?  Hmmm.... */
 	public function getConceptData($filePathAndName)
 	{
+		$myFile = "concepts/wwwjscom/".$this->getName().".xml";
 
-		$myFile = "concepts/".$this->getName().".xml";
-
-		$fh = fopen($myFile, 'r') or die("can't open file");
-		$contents = fread($fh, filesize($myFile));
-		echo $contents;
-		fclose($fh);
+		echo $this->fileRead($myFile);
 	}
 
 	/* Returns all concepts that a given user has created over time.
@@ -108,113 +177,23 @@ class Functions {
 	/* Concepts Class/Functions */
 	public function addConcept()
 	{
-		$input = $this->getInput();
+		$this->fileWrite($this->getInput());
+	}
 
-		/* Split the input by char */
-		$inputArray = $this->splitByChar($input);
-
-		$inputArrayLength = sizeOf($inputArray);
-
-		/* Setup loop variables */
-		$p_n 		= null;
-		$term_i 	= null;
-		$c 		= null;
-		$c_all 		= null;
-		$p_type 	= null;
-		$logicArray	= $this->getLogicArray();
-
-		$xmlArray[] = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
-		$xmlArray[] = "<concept>\n";
-
-		for($i = 0; $inputArrayLength > $i; $i++)
-		{
-			$c = $inputArray[$i];	
-			
-			/* If c is an open bracket */
-			if($c == "(" || $c == "[")
-			{
-				if($c_all != null)
-				{
-					$xmlArray[] = "$c_all</term>\n";
-				} else if($term_i != null) {
-					$xmlArray[] = "$term_i</term>\n";
-				}
-
-				$xmlArray[] = "<bracket>\n";
-				$term_i = null;
-				$c_all 	= null;
-				$p_type = "Bracket";
-			} else if ($c == ")" || $c == "]") {
-			/* If c is an close bracket */
-
-				if($c_all != null)
-				{
-					$xmlArray[] = "$c_all</term>\n";
-				} else if($term_i != null) {
-					$xmlArray[] = "$term_i</term>\n";
-				}
-				
-				$xmlArray[] = "</bracket>\n";
-				$term_i = null;
-				$c_all 	= null;
-				$p_type = "Bracket";
-			} 
-		
-
-			else if ($this->isLogic($c_all) == true) {
-			/* If c is a logic */
-				
-				if($c_all != null || $term_i != null)
-				{
-					$xmlArray[] = "$term_i</term>\n";
-				}
-				$xmlArray[] = "<logic>$c_all</logic>\n";
-
-				$p_type = "Logic";
-				$c_all = null;
-				$term_i = null;
-
-			/* If c is a space */
-			} else if ($c == " ") {
-				$isLogic = $this->isLogic($c_all);
-				//echo "IsLogic: $isLogic";
-				if($this->isLogic($c_all) == false)
-				{
-					$term_i = $c_all;
-				} else if ($p_type == "Logic" || $p_type == "Bracket") {
-					// Do Nothing
-				}
-				$xmlArray[] = $term_i." ";
-
-				$c_all = null;
-				$p_type = "Space";
-			} else {
-			/* otherwise c is just a term */	
-				if($c_all == null && $term_i == null)
-				{
-					$xmlArray[] = "<term>";
-				}
-
-				$c_all = $c_all."".$c;
-				$p_type = "Char";
-				$term_i = null;
-			}
-		}
-
-		if($c_all != null)
-		{
-			$xmlArray[] = "$c_all</term>\n";
-		}
-
-		$xmlArray[] = "</concept>\n";
-
-		$xmlString = $this->errorCorrect($xmlArray);
-
-		$myFile = "concepts/".$this->getName().".xml";
+	public function fileWrite($input)
+	{
+		$myFile = "concepts/wwwjscom/".$this->getName().".xml";
 		$fh = fopen($myFile, 'w') or die("can't open file");
-		fwrite($fh, $xmlString);
+		fwrite($fh, $input);
 		fclose($fh);
-		
+	}
+
+	public function fileRead($myFile)
+	{
+		$fh = fopen($myFile, 'r') or die("can't open file");
+		$contents = fread($fh, filesize($myFile));
+		fclose($fh);
+		return $contents;
 	}
 
 	public function errorCorrect($xmlArray)
@@ -264,6 +243,111 @@ class Functions {
 		return $myArray;
 	}	
 
+}
+
+
+class OB_FileWriter
+{
+	private $_filename;
+	private $_fp = null;
+	private $_errorHandlersRegistered = false;
+
+	public function __construct($filename)
+	{
+		$this->setFilename($filename);
+	}
+
+	public function __destruct()
+	{
+		//Make sure no data is lost
+		if($this->_fp)
+			$this->end();
+	}
+
+	public function setFilename($filename)
+	{
+		$this->_filename = $filename;
+	}
+
+	public function getFilename()
+	{
+		return $this->_filename;
+	}
+
+	public function setHaltOnError($value)		
+	{
+		//If new state is same as old, don't do anything
+		if($value === $this->_errorHandlersRegistered)
+			return;
+
+
+		if($value === true)
+		{
+			set_exception_handler(array($this,'exceptionHandler'));
+			set_error_handler(array($this,'errorHandler'));	
+			$this->_errorHandlersRegistered = true;
+		}
+		else
+		{
+			restore_error_handler();
+			restore_exception_handler();
+			$this->_errorHandlersRegistered = false;
+		}
+	}
+
+	public function start()
+	{
+		$this->_fp = @fopen($this->_filename,'w');
+		if(!$this->_fp)
+			throw new Exception('Cannot open file '.$this->_filename.' for writing!');
+
+		ob_start(array($this,'outputHandler'),1024);
+	}
+
+	public function end()
+	{
+		$this->_stopBuffering();
+		$this->setHaltOnError(false);
+	}
+
+	private function _stopBuffering()
+	{
+		@ob_end_flush();
+		if($this->_fp)
+			fclose($this->_fp);
+
+		$this->_fp = null;
+	}
+
+	public function outputHandler($buffer)
+	{
+		fwrite($this->_fp,$buffer);
+	}
+
+	public function exceptionHandler($exception)
+	{
+		$this->_stopBuffering();
+		echo '<b>Fatal error: uncaught', $exception;
+	}
+
+	public function errorHandler($errno, $errstr, $errfile, $errline)
+	{		
+		$this->_stopBuffering();
+		$errorNumber = E_USER_ERROR;
+		switch($errno)
+		{
+		case E_ERROR:
+			$errorNumber = E_USER_ERROR;
+			break;
+		case E_NOTICE:
+			$errorNumber = E_USER_NOTICE;
+			break;
+		case E_WARNING:
+			$errorNumber = E_USER_WARNING;
+			break;
+		}
+		trigger_error("$errstr, File: $errfile line $errline",$errorNumber);
+	}
 }
 
 ?>
