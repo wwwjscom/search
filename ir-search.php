@@ -57,11 +57,13 @@ class Functions {
 		//echo $xml->getName() . "<br />";
 		$input = null;
 
+		$input = $this->loop($xml);
+
+/*
 		foreach($xml->children() as $child)
 		{
 			$label = $child->attributes()->label;
 
-			/* This will have children */
 			if($label == "ALL" || $label == "NOT")
 			{
 				foreach($child->children() as $subchild)
@@ -73,6 +75,7 @@ class Functions {
 			$input = $input."".$child->getName() . ": " . $child . "<br />";
 			$input = $input."".$child->attributes()->label . ": " . $child . "<br />";
 		}
+*/
 
 
 		$this->setInput($input);
@@ -80,25 +83,34 @@ class Functions {
 		$this->addConcept();
 	}
 
-	public function loop($xml, $isNot = false)
+	public function loop($xml)
 	{
-		if($isNot)
-			$input .= "NOT ";
-
-		$input .= "{";
+		$input = null;
+		
+		$input .= "{ ";
 
 		foreach($xml->children() as $child)
 		{
 			$label = $child->attributes()->label;
+			$isFolder = $child->attributes()->isFolder;
 		
-			if($label == "ALL")
-				$this->loop($child);
-			else if($label == "NOT")
-				$this->loop($child, true);
-
-			$input .= $child->getName();
+			if($isFolder == "true")
+			{
+				if($label == "ALL")
+					$input .= $this->loop($child);
+				else if($label == "NOT") {
+					$input .= $label . " ";
+					$input .= $this->loop($child);
+				} else {
+					$input .= $this->loop($child);
+				}
+			} else {
+				$input .= $label . " ";
+			}
 		}
-		$input .= "}";
+		$input .= "} ";
+
+		return $input;
 	}
 
 	public function updateConceptData($fileName)
