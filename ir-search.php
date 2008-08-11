@@ -1,8 +1,8 @@
 <?
 
-@$func		= $_GET['func'];
-@$input 	= $_GET['input'];
-@$name 		= $_GET['name'];
+@$func		= $_POST['func'];
+@$input 	= $_POST['input'];
+@$name 		= $_POST['name'];
 
 $funcClass = new Functions;
 $funcClass->setName($name);
@@ -48,46 +48,22 @@ class Functions {
 
 	public function query()
 	{
-		$myXML = $this->getInput();
+		$myXML = stripslashes($this->getInput()); // Input is correctly received.
 
-		$myXML = $this->fileRead("concepts/wwwjscom/INPUT_QUERY.XML");
+		$xml = simplexml_load_string($this->fixCDATA($myXML));
 
-
-		$xml = simplexml_load_string($myXML);
-		//echo $xml->getName() . "<br />";
-		$input = null;
-
-		$input = $this->loop($xml);
-
-/*
-		foreach($xml->children() as $child)
-		{
-			$label = $child->attributes()->label;
-
-			if($label == "ALL" || $label == "NOT")
-			{
-				foreach($child->children() as $subchild)
-				{
-					
-				}
-			}
-
-			$input = $input."".$child->getName() . ": " . $child . "<br />";
-			$input = $input."".$child->attributes()->label . ": " . $child . "<br />";
-		}
-*/
-
-
+		$input = $this->loop($xml); // Problem is in here?
 		$this->setInput($input);
-		$this->setName("QUERY");
-		$this->addConcept();
+
+		$this->setName("FUCKKKKKK"); // Filename is correctly set
+		$this->addConcept(); // Contents are correctly written
 	}
 
 	public function loop($xml)
 	{
-		$input = null;
+		//$input = null;
 		
-		$input .= "{ ";
+		$input = "{ ";
 
 		foreach($xml->children() as $child)
 		{
@@ -192,9 +168,12 @@ class Functions {
 		$this->fileWrite($this->getInput());
 	}
 
-	public function fileWrite($input)
+	public function fileWrite($input, $filename = null)
 	{
-		$myFile = "concepts/wwwjscom/".$this->getName().".xml";
+		if($filename != null)
+			$myFile = "concepts/wwwjscom/".$filename.".xml";
+		else
+			$myFile = "concepts/wwwjscom/".$this->getName().".xml";
 		$fh = fopen($myFile, 'w') or die("can't open file");
 		fwrite($fh, $input);
 		fclose($fh);

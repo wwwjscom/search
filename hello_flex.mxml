@@ -433,11 +433,26 @@
 			editThisConceptName.text = editThisConcept.selectedLabel;
 		}
 		//<name>{editThisConcept.selectedLabel}</name>
+
+
+		/* Sets up a custom label function used by the query tree */
+		private function _labelFunction(item:Object):String {
+			return item.label;
+		}
+
+            [Bindable]
+            private var dataX:XML =
+                <item label="Top">
+
+                <item label="Child One"/>
+                <item label="Child Two" />
+            </item>;
+
 		]]>
 	</mx:Script>
 
    <mx:HTTPService result="handleXMLUpdateEditForm(event);" fault="handleFault(event);" id="getConceptData" resultFormat="text"
-    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+    	method="POST" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getConceptData</func>
 		<name>{editThisConceptName.text}</name>
@@ -445,7 +460,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="text"
-    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+    	method="POST" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>addConcept</func>
 	        <input>{newConceptString.text}</input>
@@ -454,7 +469,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="getAllConcepts" resultFormat="e4x"
-    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+    	method="POST" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getAllConcepts</func>
 	        <name>wwwjscom</name>
@@ -462,7 +477,7 @@
     </mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="updateConceptData" resultFormat="text"
-    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+    	method="POST" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>updateConceptData</func>
 		<name>{editThisConceptName.text}</name>
@@ -471,10 +486,10 @@
     </mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="query" resultFormat="text"
-    	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
+    	method="POST" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>query</func>
-		<input>{treeData.node}</input>
+		<input>{treeData}</input>
 	    </mx:request>
     </mx:HTTPService>
 
@@ -523,6 +538,7 @@
 						<mx:Tree height="100%" width="186" left="10" top="30" bottom="10" id="tree"
 						    labelField="@label"
 						    dataProvider="{treeData.node}"
+						labelFunction="_labelFunction"
 						    dropEnabled="false"
 						    dragMoveEnabled="false"
 						    dragEnter="onDragEnter(event)"
@@ -805,26 +821,25 @@
 	</mx:VBox>
 
 <mx:XML id="treeData" xmlns="">
-
-        <root>
-            <node label="ALL" type="rootAll" data="rootAll">
-                <node label="Cars" type="rootCars" >
-                    <node label="Ford" type="car" />
-                    <node label="GMC" type="car" />
-                    <node label="Honda" type="car" />
-	            <node label="NOT" type="rootCars" >
-                        <node label="Saturn" type="car" />
-		    </node>
-                </node>
+<root>
+    <node label="ALL" type="rootAll" data="rootAll" isFolder="true">
+        <node label="Cars" type="rootCars" isFolder="true" >
+            <node label="MINIIIIIIIIIIIIII" type="car" isFolder="false" />
+            <node label="GMC" type="car" isFolder="false" />
+            <node label="Honda" type="car" isFolder="false" />
+            <node label="NOT" type="rootCars" isFolder="true" >
+                <node label="Saturn" type="car" isFolder="false" />
             </node>
-            <node label="NOT" type="rootNot" data="rootNot">
-                <node label="Boats" type="rootBoats" >
-                    <node label="Speed Boats" type="speedBoats" />
-                </node>
-            </node>
+        </node>
+    </node>
+    <node label="NOT" type="rootNot" data="rootNot" isFolder="true">
+        <node label="Boats" type="rootBoats" isFolder="true" >
+            <node label="Speed Boats" type="speedBoats" isFolder="false" />
+        </node>
+    </node>
+</root>
 
-        </root>
-    </mx:XML>    
+</mx:XML>    
 
 <!--
     <mx:Array id="listData">
