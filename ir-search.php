@@ -28,21 +28,17 @@ class Functions {
 				break;
 			case "getConceptData":
 				// In this case, name represents the username/filename.xml
-				//$this->getConceptData($this->getName());
 				$this->getConceptData($this->name);
-				break;
-			case "javaTest":
-				//$java = shell_exec('java JavaLink1');
-				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
-				echo($java);
 				break;
 			case "updateConceptData":
 				$this->updateConceptData($this->name);
 				break;
 			case "query":
-				//$this->setName("QUERY.xml");
-				//$this->addConcept();
 				$this->query();
+				break;
+			case "queryOracle":
+				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
+				echo($java);
 				break;
 		}
 	}
