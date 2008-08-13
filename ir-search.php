@@ -1,8 +1,8 @@
 <?
 
-@$func		= $_POST['func'];
-@$input 	= $_POST['input'];
-@$name 		= $_POST['name'];
+@$func		= $_GET['func'];
+@$input 	= $_GET['input'];
+@$name 		= $_GET['name'];
 
 $funcClass = new Functions;
 $funcClass->setName($name);
@@ -32,7 +32,8 @@ class Functions {
 				$this->getConceptData($this->name);
 				break;
 			case "javaTest":
-				$java = shell_exec('java JavaLink1');
+				//$java = shell_exec('java JavaLink1');
+				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
 				echo($java);
 				break;
 			case "updateConceptData":
