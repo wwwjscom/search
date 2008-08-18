@@ -475,11 +475,12 @@
     				event.index + ", capital is: " +
     				targetComp.dataProvider[event.index].data;
     		}	
+    	//method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
 		]]>
 	</mx:Script>
 
    <mx:HTTPService result="handleXMLUpdateEditForm(event);" fault="handleFault(event);" id="getConceptData" resultFormat="text"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="file:///var/www/QueryBuilder/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getConceptData</func>
 		<name>{editThisConceptName.text}</name>
@@ -487,7 +488,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="text"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="file:///var/www/QueryBuilder/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>addConcept</func>
 	        <input>{newConceptString.text}</input>
@@ -496,7 +497,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="getAllConcepts" resultFormat="e4x"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="file:///var/www/QueryBuilder/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getAllConcepts</func>
 	        <name>wwwjscom</name>
@@ -504,7 +505,7 @@
     </mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="updateConceptData" resultFormat="text"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="file:///var/www/QueryBuilder/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>updateConceptData</func>
 		<name>{editThisConceptName.text}</name>
@@ -513,7 +514,7 @@
     </mx:HTTPService>
 
    <mx:HTTPService result="handleQueryResults(event);" fault="handleFault(event);" id="query" resultFormat="e4x"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="file:///var/www/QueryBuilder/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>query</func>
 		<input>{treeData}</input>
