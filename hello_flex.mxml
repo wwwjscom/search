@@ -21,16 +21,9 @@
 		    public var menuBarCollection:XMLListCollection;
 	    
 		    private var menubarXML:XMLList =<>
-			<menuitem label="Engines">
-			    <menuitem label="SQLGen" data="1A"/>
-			    <menuitem label="Lucene" data="1B"/>
-			</menuitem>
 			<menuitem label="Concepts">
 			    <menuitem label="New" data="2A"/>
 			    <menuitem label="Edit" data="2B"/>
-			    <menuitem label="Delete" data="2C"/>
-			    <menuitem label="Import" data="2D"/>
-			    <menuitem label="Save" data="2E"/>
 			</menuitem>
 			<menuitem label="Query">
 			    <menuitem label="Show Query" data="3A"/>
@@ -144,17 +137,17 @@
 
 		//query.dataProvider = new ArrayCollection([]);
 
-                synonymsList.dataProvider = new ArrayCollection([
-			{label:"lawl", data:"lawl"},
-			{label:"catz", data:"catz"},
-			{label:"wham", data:"wham"}
-			]);
+        //        synonymsList.dataProvider = new ArrayCollection([
+	//		{label:"lawl", data:"lawl"},
+	//		{label:"catz", data:"catz"},
+	//		{label:"wham", data:"wham"}
+	//		]);
 
-                antonymsList = new ArrayCollection([
-			{label:"unl337", data:"unl337"},
-			{label:"blanko el gato", data:"blanko el gato"},
-			{label:"50 cent", data:"50 cent"}
-			]);
+        //        antonymsList = new ArrayCollection([
+	//		{label:"unl337", data:"unl337"},
+	//		{label:"blanko el gato", data:"blanko el gato"},
+	//		{label:"50 cent", data:"50 cent"}
+	//		]);
             }
 
 		[Bindable]
@@ -470,7 +463,7 @@
 		/* PARSE QUERYRESULTS XML AND SET EACH CHILD NODE TO THE
 		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
             [Bindable]
-            public var queryResultsArray:Array = [{label:"Alabama", data:"Montgomery"},
+            public var queryResultsArray:Array = [{label:"Lucid", data:"lawl"},
                 {label:"Oracle", data:"lawl"},
                 {label:"Lucene", data:"lawl"}
             ];
@@ -580,14 +573,7 @@
 		<mx:State name="showQuery">
 			<mx:AddChild relativeTo="{loginPanel}" position="lastChild">
 				<mx:target>
-					<mx:Canvas
-					cornerRadius="10"
-					borderStyle="solid"
-					backgroundColor="#A9A9A9"
-					width="100%"
-					height="100%"
-					>
-
+					<mx:HBox>
 						<mx:Label text="Query" left="10" top="10"/>
 						<mx:Tree height="100%" width="186" left="10" top="30" bottom="10" id="tree"
 						    labelField="@label"
@@ -598,7 +584,6 @@
 						    dragOver="onDragOver(event)"
 						    dragDrop="onDragDrop(event)">
 						</mx:Tree>    
-					<mx:LinkButton id="QueryNOW" label="queryNOW" click="query.send();currentState='queryResults'"/>
 						<mx:Label text="Concepts" right="5" top="10"/>
 						<mx:List width="188" height="206" right="10" top="30" id="concepts"
 							dataProvider="{allConcepts}"
@@ -607,9 +592,10 @@
 						    dragMoveEnabled="true"
 						    dragComplete="onDragComplete(event)">
 						</mx:List>        
+					<mx:LinkButton id="QueryNOW" label="queryNOW" click="query.send();currentState='queryResults'"/>
 
 					<!--<mx:LinkButton id="getALL" label="getALL" click="getAllConcepts.send()"/>-->
-					</mx:Canvas>
+					</mx:HBox>
 				</mx:target>
 			</mx:AddChild>
 			<mx:SetProperty target="{loginPanel}" name="title" value="Your Query"/>
@@ -669,6 +655,7 @@
 					</mx:Canvas>
 				</mx:target>
 			</mx:AddChild>
+			<!--
 			<mx:AddChild relativeTo="{col2}" position="firstChild">
 				<mx:target>
 					<mx:HBox>
@@ -680,7 +667,6 @@
 			<mx:AddChild relativeTo="{col2}" position="lastChild">
 				<mx:target>
 					<mx:Accordion id="accordion" width="10%" height="100%">
-					<!-- Define each panel using a VBox container. -->
 						<mx:VBox label="Synonyms" width="100%" id="VB1">
 							<mx:List id="synonymsList" width="100%"
 							borderStyle="dotted"
@@ -715,6 +701,7 @@
 					</mx:Accordion>
 				</mx:target>
 			</mx:AddChild>
+			-->
 			<mx:SetProperty target="{loginPanel}" name="title" value="New Concept"/>
 			<mx:RemoveChild target="{registerLink}"/>
 			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
@@ -722,9 +709,8 @@
 					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="currentState='conceptAdded'"/>-->
 					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="setQuery()"/>-->
 					<mx:HBox>
-						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();"/>
-							<mx:TextArea text="{allConcepts}"/>
-
+						<mx:Label text="Concept Name: " />
+						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();Alert.show('Added');"/>
 					</mx:HBox>
 				</mx:target>
 			</mx:AddChild>

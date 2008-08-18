@@ -132,7 +132,7 @@ class Functions {
 				{
 					$this->setName($label);
 					$concept = $this->getConceptData($label, true);
-					$input .= $concept . " ";
+					$input .= $concept . "AND ";
 				}
 			}
 		}
