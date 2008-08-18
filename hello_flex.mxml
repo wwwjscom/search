@@ -536,12 +536,11 @@
 					width="100%"
 					height="100%"
 					>
-    <mx:Button label="Add Empty Branch through the dataProvider" click="addEmptyBranch();"/>
 
 						<mx:Label text="Query" left="10" top="10"/>
 						<mx:Tree height="100%" width="186" left="10" top="30" bottom="10" id="tree"
 						    labelField="@label"
-						    dataProvider="{dataX}"
+						    dataProvider="{treeData.node}"
 						    dropEnabled="false"
 						    dragMoveEnabled="false"
 						    dragEnter="onDragEnter(event)"
