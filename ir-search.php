@@ -55,6 +55,12 @@ class Functions {
 		return $java;
 	}
 
+	public function queryLucid($query)
+	{
+		$java = shell_exec('/mnt/deliriumdata/prymek/LucidFocus/trec/query.sh -p dismax.properties -y "'. $query .'" -r results');
+		return $java;
+	}
+
 	public function query()
 	{
 		$myXML = stripslashes($this->getInput()); // Input is correctly received.
@@ -71,6 +77,8 @@ class Functions {
 		$this->fileWrite($input, "/tmp/query");
 		$luceneResults = $this->queryLucene();
 
+		$lucidResults = $this->queryLucid($input);
+
 		/**********************
 		 * Insert other query methods here
 		 *********************/
@@ -79,16 +87,17 @@ class Functions {
 		/**********************
 		 * Build the results in XML
 		 **********************/
-		$queryXMLResults = $this->buildQueryResults($luceneResults);
+		$queryXMLResults = $this->buildQueryResults($luceneResults, $lucidResults);
 		return $queryXMLResults;
 	}
 
 	/* Builds the query results as an XML list */
-	public function buildQueryResults($luceneResults)
+	public function buildQueryResults($luceneResults, $lucidResults)
 	{
 		$results  = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 		$results .= "<results>";
 		$results .= "<oracle>$luceneResults</oracle>";
+		$results .= "<lucid>$lucidResults</lucid>";
 		$results .= "</results>";
 	}
 
