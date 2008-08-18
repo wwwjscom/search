@@ -34,6 +34,8 @@ class Functions {
 				$this->updateConceptData($this->name);
 				break;
 			case "query":
+				/* First we convert all the concepts back to the terms */
+				$this->conceptsToTerms();
 				$this->query();
 				break;
 			case "queryOracle":
@@ -43,11 +45,21 @@ class Functions {
 		}
 	}
 
+
+	/* This fucntion is called prior to querying to convert all of the
+	 * user's concepts into terms they have entered.
+	 */
+	public function conceptsToTerms()
+	{
+		
+	}
+
 	public function query()
 	{
 		$myXML = stripslashes($this->getInput()); // Input is correctly received.
 
-		$xml = simplexml_load_string($this->fixCDATA($myXML));
+		//$xml = simplexml_load_string($this->fixCDATA($myXML));
+		$xml = simplexml_load_string($myXML);
 
 		$input = $this->loop($xml); // Problem is in here?
 		$this->setInput($input);
