@@ -96,7 +96,7 @@ class Functions {
 	{
 		$results  = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 		$results .= "<results>";
-		$results .= "<oracle>$luceneResults</oracle>";
+		$results .= "<lucene>$luceneResults</lucene>";
 		$results .= "<lucid>$lucidResults</lucid>";
 		$results .= "</results>";
 	}

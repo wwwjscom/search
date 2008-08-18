@@ -463,9 +463,9 @@
 		/* PARSE QUERYRESULTS XML AND SET EACH CHILD NODE TO THE
 		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
             [Bindable]
-            public var queryResultsArray:Array = [{label:"Lucid", data:"lawl"},
+            public var queryResultsArray:Array = [{label:"Lucid", data:queryResults.result.lucid},
                 {label:"Oracle", data:"lawl"},
-                {label:"Lucene", data:"lawl"}
+                {label:"Lucene", data:queryResults.result.lucene}
             ];
             
     		private function clickEvt(event:ItemClickEvent):void {
