@@ -36,7 +36,7 @@ class Functions {
 			case "query":
 				/* First we convert all the concepts back to the terms */
 				$this->conceptsToTerms();
-				$this->query();
+				$this->query(false);
 				break;
 			case "queryOracle":
 				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
@@ -51,18 +51,29 @@ class Functions {
 	 */
 	public function conceptsToTerms()
 	{
+			
+	}
+
+	public function queryToArray()
+	{
 		
 	}
 
-	public function query()
+	public function query($convert = false)
 	{
 		$myXML = stripslashes($this->getInput()); // Input is correctly received.
 
-		//$xml = simplexml_load_string($this->fixCDATA($myXML));
 		$xml = simplexml_load_string($myXML);
 
 		$input = $this->loop($xml); // Problem is in here?
 		$this->setInput($input);
+
+		/* Should we convert the users concepts into terms? */
+		if($convert === true)
+		{
+			$this->queryToArray();
+			$this->conceptsToTerms();
+		}
 
 		$this->setName("FUCKKKKKK"); // Filename is correctly set
 		$this->addConcept(); // Contents are correctly written
@@ -70,15 +81,16 @@ class Functions {
 
 	public function loop($xml)
 	{
-		//$input = null;
-		
+		// Opening required bracket
 		$input = "{ ";
 
+		// Loop through all of the sub-nodes for the given node
 		foreach($xml->children() as $child)
 		{
 			$label = $child->attributes()->label;
 			$isFolder = $child->attributes()->isFolder;
 		
+			// If we are looking at a folder then we need to recursively loop through it
 			if($isFolder == "true")
 			{
 				if($label == "ALL")
@@ -87,12 +99,21 @@ class Functions {
 					$input .= $label . " ";
 					$input .= $this->loop($child);
 				} else {
+					// This pretty much doesn't do anything until we implement custom folders
 					$input .= $this->loop($child);
 				}
 			} else {
-				$input .= $label . " ";
+				// Otherwise we are just looking at a normal node, so lets convert
+				// that node (concept) into the terms
+				//$input .= $label . " ";
+				
+				$this->setName($label);
+				$concept = $this->getConceptData($label, true);
+				$input .= $concept . " ";
 			}
 		}
+
+		// Required closing bracket
 		$input .= "} ";
 
 		return $input;
@@ -110,12 +131,18 @@ class Functions {
 	/* Returns the concept data.  This allows the user to edit it.  However,
 	 * currently we display the XML to the user, we will need to write a funcion
 	 * which will convert the XML back to plain text.  Or can we just use the DOM
-	 * or simpleXML object in php...?  Hmmm.... */
-	public function getConceptData($filePathAndName)
+	 * or simpleXML object in php...?  Hmmm.... 
+	 *
+	 *	Input: return::boolean -> should we return the data or echo it (echo is used when called by FLEX)
+	 */
+	public function getConceptData($filePathAndName, $return = false)
 	{
 		$myFile = "concepts/wwwjscom/".$this->getName().".xml";
 
-		echo $this->fileRead($myFile);
+		if($return === true)
+			return $this->fileRead($myFile);
+		else
+			echo $this->fileRead($myFile);
 	}
 
 	/* Returns all concepts that a given user has created over time.
