@@ -35,8 +35,7 @@ class Functions {
 				break;
 			case "query":
 				/* First we convert all the concepts back to the terms */
-				$this->conceptsToTerms();
-				$this->query(false);
+				$this->query();
 				break;
 			case "queryOracle":
 				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
@@ -45,21 +44,18 @@ class Functions {
 		}
 	}
 
-
-	/* This fucntion is called prior to querying to convert all of the
-	 * user's concepts into terms they have entered.
+	/* This function simply queries oracle.  The query must be written to /tmp/query.
+	 * We can probably change that in the future to be accepted command line, or
+	 * something easier
 	 */
-	public function conceptsToTerms()
+	public function queryOracle()
 	{
-			
+		$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
+		//echo($java);
+		return $java;
 	}
 
-	public function queryToArray()
-	{
-		
-	}
-
-	public function query($convert = false)
+	public function query()
 	{
 		$myXML = stripslashes($this->getInput()); // Input is correctly received.
 
@@ -68,15 +64,32 @@ class Functions {
 		$input = $this->loop($xml); // Problem is in here?
 		$this->setInput($input);
 
-		/* Should we convert the users concepts into terms? */
-		if($convert === true)
-		{
-			$this->queryToArray();
-			$this->conceptsToTerms();
-		}
-
 		$this->setName("FUCKKKKKK"); // Filename is correctly set
 		$this->addConcept(); // Contents are correctly written
+
+		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
+		$this->fileWrite($input, "/tmp/query");
+		$oracleResults = $this->queryOracle();
+
+		/**********************
+		 * Insert other query methods here
+		 *********************/
+
+
+		/**********************
+		 * Build the results in XML
+		 **********************/
+		$queryXMLResults = $this->buildQueryResults($oracleResults);
+		return $queryXMLResults;
+	}
+
+	/* Builds the query results as an XML list */
+	public function buildQueryResults($oracleResults)
+	{
+		$results  = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
+		$results .= "<results>";
+		$results .= "<oracle>$oracleResults</oracle>";
+		$results .= "</results>";
 	}
 
 	public function loop($xml)
@@ -107,9 +120,20 @@ class Functions {
 				// that node (concept) into the terms
 				//$input .= $label . " ";
 				
-				$this->setName($label);
-				$concept = $this->getConceptData($label, true);
-				$input .= $concept . " ";
+				/******************************************************
+				 ******************************************************
+				 * This if condition should be removed, but NOT the content.
+				 * This is used because of an error within the FLEX XML,
+				 * it is a work-around for error #3
+				 *****************************************************
+				 *****************************************************
+				 */
+				if($label != "NONOTME")
+				{
+					$this->setName($label);
+					$concept = $this->getConceptData($label, true);
+					$input .= $concept . " ";
+				}
 			}
 		}
 
@@ -207,7 +231,7 @@ class Functions {
 	public function fileWrite($input, $filename = null)
 	{
 		if($filename != null)
-			$myFile = "concepts/wwwjscom/".$filename.".xml";
+			$myFile = $filename;
 		else
 			$myFile = "concepts/wwwjscom/".$this->getName().".xml";
 		$fh = fopen($myFile, 'w') or die("can't open file");

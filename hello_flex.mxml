@@ -2,7 +2,7 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 	layout="horizontal"
 	backgroundColor="black"
-	creationComplete="initApp();initCollections();"
+	creationComplete="initApp();initCollections();getAllConcepts.send()"
 	>
 
 	<mx:Script>
@@ -408,6 +408,7 @@
 
 	   [Bindable]
 	   private var allConcepts:XMLList;
+	   private var queryResults:XMLList;
 	   private var conceptData:XMLList;
 
 	        public function handleXML(event:ResultEvent):void
@@ -415,6 +416,13 @@
                 //allConcepts = event.result.option as XMLList;
                 allConcepts = event.result.file as XMLList;
             }
+
+	    /* Handles the query XML results */
+	    public function handleQueryResults(event:ResultEvent):void
+            {
+                queryResults = event.result.file as XMLList;
+            }
+
 
 	        public function handleFault(event:FaultEvent):void
 	        {
@@ -450,6 +458,30 @@
                 <item label="Child Two" />
             </item>;
 
+
+
+
+		/************************************
+		 *  All data for the tabbed query state
+		 ************************************/
+            import mx.events.ItemClickEvent;
+            import mx.controls.TabBar;
+
+		/* PARSE QUERYRESULTS XML AND SET EACH CHILD NODE TO THE
+		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
+            [Bindable]
+            public var queryResultsArray:Array = [{label:"Alabama", data:"Montgomery"},
+                {label:"Oracle", data:"lawl"},
+                {label:"Lucene", data:"lawl"}
+            ];
+            
+    		private function clickEvt(event:ItemClickEvent):void {
+    			// Access target TabBar control.
+    			var targetComp:TabBar = TabBar(event.currentTarget);
+    			forClick.text="label is: " + event.label + ", index is: " + 
+    				event.index + ", capital is: " +
+    				targetComp.dataProvider[event.index].data;
+    		}	
 		]]>
 	</mx:Script>
 
@@ -487,7 +519,7 @@
 	    </mx:request>
     </mx:HTTPService>
 
-   <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="query" resultFormat="text"
+   <mx:HTTPService result="handleQueryResults(event);" fault="handleFault(event);" id="query" resultFormat="e4x"
     	method="GET" url="http://localhost:8888/ir/search/ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>query</func>
@@ -525,6 +557,25 @@
 			</mx:AddChild>
 			<mx:SetProperty target="{loginPanel}" name="title" value="Concept Added!"/>
 		</mx:State>
+		<!-- This is the query results state -->
+		<mx:State name="queryResults">
+			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
+				<mx:target>
+					<mx:VBox
+					height="100%"
+					width="100%"
+					>
+					
+						<mx:TabBar itemClick="clickEvt(event);" id="queryResultsTab">
+						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
+						</mx:TabBar>
+			
+						<mx:TextArea id="forClick" height="75%" width="75%"/>
+					</mx:VBox>
+				</mx:target>
+			</mx:AddChild>
+			<mx:SetProperty target="{loginPanel}" name="title" value="Query Results"/>
+		</mx:State>
 
 		<mx:State name="showQuery">
 			<mx:AddChild relativeTo="{loginPanel}" position="lastChild">
@@ -547,7 +598,7 @@
 						    dragOver="onDragOver(event)"
 						    dragDrop="onDragDrop(event)">
 						</mx:Tree>    
-					<mx:LinkButton id="QueryNOW" label="queryNOW" click="query.send()"/>
+					<mx:LinkButton id="QueryNOW" label="queryNOW" click="query.send();currentState='queryResults'"/>
 						<mx:Label text="Concepts" right="5" top="10"/>
 						<mx:List width="188" height="206" right="10" top="30" id="concepts"
 							dataProvider="{allConcepts}"
@@ -557,7 +608,7 @@
 						    dragComplete="onDragComplete(event)">
 						</mx:List>        
 
-					<mx:LinkButton id="getALL" label="getALL" click="getAllConcepts.send()"/>
+					<!--<mx:LinkButton id="getALL" label="getALL" click="getAllConcepts.send()"/>-->
 					</mx:Canvas>
 				</mx:target>
 			</mx:AddChild>
@@ -701,6 +752,16 @@
 		    </mx:Sequence>
 		</mx:Transition>
 
+		<!-- Define the transition for edit a concept.-->
+		<mx:Transition id="toQueryResults" fromState="*" toState="queryResults">
+		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
+			<mx:RemoveChildAction/>
+			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
+			<mx:Resize target="{loginPanel}" heightTo="450" widthTo="500"/>
+			<mx:AddChildAction/>
+		    </mx:Sequence>
+		</mx:Transition>
+
 		<!-- Define the transition for editing a concept.-->
 		<mx:Transition id="toEditingConcept" fromState="*" toState="editingConcept">
 		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
@@ -823,8 +884,18 @@
 	</mx:VBox>
 
 <mx:XML id="treeData" xmlns="">
+
+<!-- isFolder is technically DEPRECATED. We should change all isFolder's
+to isBranch and same in the PHP code -->
+
 <root>
-    <node label="MINE" type="rootAll" data="rootAll" isFolder="false">
+    <node label="ALL"  isFolder="true">
+	    <node label="NONOTME"/>
+    </node>
+    <node label="NOT"  isFolder="true" isBranch="true">
+	    <node label="NONOTME"/>
+    </node>
+	    <!--<node label="MINE" type="rootAll" data="rootAll" isFolder="false">-->
 	   <!--
     <node label="ALL" type="rootAll" data="rootAll" isFolder="true">
         <node label="Cars" type="rootCars" isFolder="true" >
@@ -841,8 +912,8 @@
         <node label="Boats" type="rootBoats" isFolder="true" >
             <node label="Speed Boats" type="speedBoats" isFolder="false" />
 	    </node>
-	    -->
     </node>
+	    -->
 </root>
 
 </mx:XML>    
