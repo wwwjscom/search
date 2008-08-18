@@ -37,7 +37,7 @@ class Functions {
 				/* First we convert all the concepts back to the terms */
 				$this->query();
 				break;
-			case "queryOracle":
+			case "queryLucene":
 				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
 				echo($java);
 				break;
@@ -48,7 +48,7 @@ class Functions {
 	 * We can probably change that in the future to be accepted command line, or
 	 * something easier
 	 */
-	public function queryOracle()
+	public function queryLucene()
 	{
 		$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
 		//echo($java);
@@ -69,7 +69,7 @@ class Functions {
 
 		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
 		$this->fileWrite($input, "/tmp/query");
-		$oracleResults = $this->queryOracle();
+		$luceneResults = $this->queryLucene();
 
 		/**********************
 		 * Insert other query methods here
@@ -79,16 +79,16 @@ class Functions {
 		/**********************
 		 * Build the results in XML
 		 **********************/
-		$queryXMLResults = $this->buildQueryResults($oracleResults);
+		$queryXMLResults = $this->buildQueryResults($luceneResults);
 		return $queryXMLResults;
 	}
 
 	/* Builds the query results as an XML list */
-	public function buildQueryResults($oracleResults)
+	public function buildQueryResults($luceneResults)
 	{
 		$results  = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 		$results .= "<results>";
-		$results .= "<oracle>$oracleResults</oracle>";
+		$results .= "<oracle>$luceneResults</oracle>";
 		$results .= "</results>";
 	}
 
