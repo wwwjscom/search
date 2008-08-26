@@ -74,7 +74,12 @@ class Functions {
 		$this->addConcept(); // Contents are correctly written
 
 		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
-		$this->fileWrite($input, "/tmp/query");
+		/* BUG HERE!!!!! We must correctly format the query before writing it to the file */
+		$luceneInput 	= "<top>\n";
+		$luceneInput .= "<num> Number: 1\n";
+		$luceneInput .= "<title> $input\n";
+		$luceneInput .= "</top>\n";
+		$this->fileWrite($luceneInput, "/tmp/query");
 		$luceneResults = $this->queryLucene();
 
 		$lucidResults = $this->queryLucid($input);
@@ -88,7 +93,7 @@ class Functions {
 		 * Build the results in XML
 		 **********************/
 		$queryXMLResults = $this->buildQueryResults($luceneResults, $lucidResults);
-		return $queryXMLResults;
+		echo $queryXMLResults;
 	}
 
 	/* Builds the query results as an XML list */
@@ -99,12 +104,13 @@ class Functions {
 		$results .= "<lucene>$luceneResults</lucene>";
 		$results .= "<lucid>$lucidResults</lucid>";
 		$results .= "</results>";
+		return $results;
 	}
 
 	public function loop($xml)
 	{
 		// Opening required bracket
-		$input = "{ ";
+		$input = "( ";
 
 		// Loop through all of the sub-nodes for the given node
 		foreach($xml->children() as $child)
@@ -117,8 +123,8 @@ class Functions {
 			{
 				if($label == "ALL")
 					$input .= $this->loop($child);
-				else if($label == "NOT") {
-					$input .= $label . " ";
+				else if($label == "NOT" && count($child->children())>1) {
+					//$input .= $label . " ";
 					$input .= $this->loop($child);
 				} else {
 					// This pretty much doesn't do anything until we implement custom folders
@@ -141,13 +147,14 @@ class Functions {
 				{
 					$this->setName($label);
 					$concept = $this->getConceptData($label, true);
-					$input .= $concept . "AND ";
+					//$input .= $concept . " AND ";
+					$input .= $concept . " ";
 				}
 			}
 		}
 
 		// Required closing bracket
-		$input .= "} ";
+		$input .= ") ";
 
 		return $input;
 	}

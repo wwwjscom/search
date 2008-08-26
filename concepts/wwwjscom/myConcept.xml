@@ -1,13 +1,1 @@
-<?xml version="1.0" encoding="ISO-8859-1"?><concept>
-<bracket>
-<bracket>
-<term>speed boats </term>
-<logic>AND</logic>
-<term>sail boats</term>
-</bracket>
- <logic>OR</logic>
-<bracket>
-<term>tug boats</term>
-</bracket>
-</bracket>
-</concept>
+speed boats AND sail boats

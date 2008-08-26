@@ -22,11 +22,11 @@
 	    
 		    private var menubarXML:XMLList =<>
 			<menuitem label="Concepts">
-			    <menuitem label="New" data="2A"/>
-			    <menuitem label="Edit" data="2B"/>
+			    <menuitem label="New" data="1A"/>
+			    <menuitem label="Edit" data="1B"/>
 			</menuitem>
 			<menuitem label="Query">
-			    <menuitem label="Show Query" data="3A"/>
+			    <menuitem label="Show Query" data="2A"/>
 			</menuitem>
 			</>
 			
@@ -45,13 +45,13 @@
 				theGoods = event.item.@data;
 				switch (theGoods)
 				{
-					case "1A":	Alert.show("Now using SQLGen Engine");
+				//	case "1A":	Alert.show("Now using SQLGen Engine");
+				//			break;
+					case "1A":	currentState='newConcept';
 							break;
-					case "2A":	currentState='newConcept';
+					case "1B":	currentState='editConcept';
 							break;
-					case "2B":	currentState='editConcept';
-							break;
-					case "3A":	currentState='showQuery';
+					case "2A":	currentState='showQuery';
 							break;
 				}
 			}                    
@@ -402,6 +402,7 @@
 	   [Bindable]
 	   private var allConcepts:XMLList;
 	   private var queryResults:XMLList;
+	   private var queryResultsString:String;
 	   private var conceptData:XMLList;
 
 	        public function handleXML(event:ResultEvent):void
@@ -413,7 +414,9 @@
 	    /* Handles the query XML results */
 	    public function handleQueryResults(event:ResultEvent):void
             {
-                queryResults = event.result.file as XMLList;
+                queryResults = event.result as XMLList;
+                queryResultsString = event.result.toString();
+								queryResultsStringField.text = event.result.toString();
             }
 
 
@@ -463,9 +466,9 @@
 		/* PARSE QUERYRESULTS XML AND SET EACH CHILD NODE TO THE
 		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
             [Bindable]
-            public var queryResultsArray:Array = [{label:"Lucid", data:queryResults.result.lucid},
+            public var queryResultsArray:Array = [{label:"Lucid", data:queryResultsString},
                 {label:"Oracle", data:"lawl"},
-                {label:"Lucene", data:queryResults.result.lucene}
+                {label:"Lucene", data:"lawl"}
             ];
             
     		private function clickEvt(event:ItemClickEvent):void {
@@ -479,7 +482,7 @@
 	</mx:Script>
 
    <mx:HTTPService result="handleXMLUpdateEditForm(event);" fault="handleFault(event);" id="getConceptData" resultFormat="text"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getConceptData</func>
 		<name>{editThisConceptName.text}</name>
@@ -487,7 +490,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="addConcept" resultFormat="text"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>addConcept</func>
 	        <input>{newConceptString.text}</input>
@@ -496,7 +499,7 @@
 	</mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="getAllConcepts" resultFormat="e4x"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>getAllConcepts</func>
 	        <name>wwwjscom</name>
@@ -504,7 +507,7 @@
     </mx:HTTPService>
 
    <mx:HTTPService result="handleXML(event);" fault="handleFault(event);" id="updateConceptData" resultFormat="text"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>updateConceptData</func>
 		<name>{editThisConceptName.text}</name>
@@ -513,7 +516,7 @@
     </mx:HTTPService>
 
    <mx:HTTPService result="handleQueryResults(event);" fault="handleFault(event);" id="query" resultFormat="e4x"
-    	method="GET" url="http://localhost:8080/QueryBuilder/ir-search.php" useProxy="false">
+    	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>query</func>
 		<input>{treeData}</input>
@@ -550,6 +553,7 @@
 			</mx:AddChild>
 			<mx:SetProperty target="{loginPanel}" name="title" value="Concept Added!"/>
 		</mx:State>
+
 		<!-- This is the query results state -->
 		<mx:State name="queryResults">
 			<mx:AddChild relativeTo="{loginPanel}" position="firstChild">
@@ -564,6 +568,10 @@
 						</mx:TabBar>
 			
 						<mx:TextArea id="forClick" height="75%" width="75%"/>
+
+							<mx:TextArea id="queryResultsStringField" width="400" height="300"
+							text="">
+							</mx:TextArea>
 					</mx:VBox>
 				</mx:target>
 			</mx:AddChild>
@@ -594,7 +602,6 @@
 						</mx:List>        
 					<mx:LinkButton id="QueryNOW" label="queryNOW" click="query.send();currentState='queryResults'"/>
 
-					<!--<mx:LinkButton id="getALL" label="getALL" click="getAllConcepts.send()"/>-->
 					</mx:HBox>
 				</mx:target>
 			</mx:AddChild>
@@ -655,59 +662,10 @@
 					</mx:Canvas>
 				</mx:target>
 			</mx:AddChild>
-			<!--
-			<mx:AddChild relativeTo="{col2}" position="firstChild">
-				<mx:target>
-					<mx:HBox>
-						<mx:Button label="Synonyms" click="accordion.selectedIndex=0;"/>
-						<mx:Button label="Antonyms" click="accordion.selectedIndex=1;"/>
-					</mx:HBox>
-				</mx:target>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{col2}" position="lastChild">
-				<mx:target>
-					<mx:Accordion id="accordion" width="10%" height="100%">
-						<mx:VBox label="Synonyms" width="100%" id="VB1">
-							<mx:List id="synonymsList" width="100%"
-							borderStyle="dotted"
-							borderThickness="2"
-							dragEnabled="true"
-							dropEnabled="false"
-							dragMoveEnabled="true"
-							dragOver="dragOverHandler(event);"
-							dragDrop="dragExitHandler(event);"
-							dragExit="dragExitHandler(event);"
-							doubleClickEnabled="true"
-							doubleClick="appendText(event);"
-							>
-							</mx:List>
-						</mx:VBox>
-						<mx:VBox label="Antonyms" width="100%" id="lawl2">
-							<mx:List width="100%"
-							dataProvider="{antonymsList}"
-							borderStyle="dotted"
-							borderThickness="2"
-							dragEnabled="true"
-							dropEnabled="false"
-							dragMoveEnabled="true"
-							dragOver="dragOverHandler(event);"
-							dragDrop="dragExitHandler(event);"
-							dragExit="dragExitHandler(event);"
-							doubleClickEnabled="true"
-							doubleClick="appendText(event);"
-							>
-							</mx:List>
-						</mx:VBox>
-					</mx:Accordion>
-				</mx:target>
-			</mx:AddChild>
-			-->
 			<mx:SetProperty target="{loginPanel}" name="title" value="New Concept"/>
 			<mx:RemoveChild target="{registerLink}"/>
 			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
 				<mx:target>
-					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="currentState='conceptAdded'"/>-->
-					<!--<mx:LinkButton id="loginButton" label="Add Concept" click="setQuery()"/>-->
 					<mx:HBox>
 						<mx:Label text="Concept Name: " />
 						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();Alert.show('Added');"/>
@@ -823,18 +781,6 @@
             itemClick="itemClickHandler(event);" 
             itemRollOver="rollOverHandler(event);"/>        
 
-<!--
-			<mx:Button label="("/>
-			<mx:Button label=")"/>
-			<mx:Button label="U"/>
-			<mx:Button label="N"/>
-
-			<mx:Spacer width="20"/>
-
-			<mx:TextInput id="term"/>
-			<mx:Button label="Add" click="lawl()"/>
-
--->
 			<mx:Spacer width="75%"/>
 		</mx:HBox>
 	</mx:Canvas>
@@ -881,42 +827,7 @@ to isBranch and same in the PHP code -->
     <node label="NOT"  isFolder="true" isBranch="true">
 	    <node label="NONOTME"/>
     </node>
-	    <!--<node label="MINE" type="rootAll" data="rootAll" isFolder="false">-->
-	   <!--
-    <node label="ALL" type="rootAll" data="rootAll" isFolder="true">
-        <node label="Cars" type="rootCars" isFolder="true" >
-            <node label="MINIIIIIIIIIIIIII" type="car" isFolder="false" />
-	    <node label="MINIIIIIIIIIIIIII" type="car" isFolder="false" />
-            <node label="GMC" type="car" isFolder="false" />
-            <node label="Honda" type="car" isFolder="false" />
-            <node label="NOT" type="rootCars" isFolder="true" >
-                <node label="Saturn" type="car" isFolder="false" />
-            </node>
-        </node>
-    </node>
-    <node label="NOT" type="rootNot" data="rootNot" isFolder="true">
-        <node label="Boats" type="rootBoats" isFolder="true" >
-            <node label="Speed Boats" type="speedBoats" isFolder="false" />
-	    </node>
-    </node>
-	    -->
 </root>
 
 </mx:XML>    
-
-<!--
-    <mx:Array id="listData">
-        <mx:String>Johnny Rocket's</mx:String>
-
-        <mx:String>Jet Pizza</mx:String>
-        <mx:String>Steve's Greek</mx:String>
-        <mx:String>Sonsie</mx:String>
-        <mx:String>The Border Cafe</mx:String>
-
-    </mx:Array>    
-    <mx:Tree id="tree2" top="72" left="50" dataProvider="{companyData}"
-        labelFunction="treeLabel"
-         height="224" width="179"/>
-        <mx:Button label="Add Operations Employee" click="addEmployee()"/><mx:TextInput id="empName"/>-->
-
 </mx:Application>
