@@ -471,13 +471,13 @@
                 {label:"Lucene", data:"lawl"}
             ];
             
-    		private function clickEvt(event:ItemClickEvent):void {
-    			// Access target TabBar control.
-    			var targetComp:TabBar = TabBar(event.currentTarget);
-    			forClick.text="label is: " + event.label + ", index is: " + 
-    				event.index + ", capital is: " +
-    				targetComp.dataProvider[event.index].data;
-    		}	
+    	//	private function clickEvt(event:ItemClickEvent):void {
+    	//		// Access target TabBar control.
+    	//		var targetComp:TabBar = TabBar(event.currentTarget);
+    	//		forClick.text="label is: " + event.label + ", index is: " + 
+    	//			event.index + ", capital is: " +
+    	//			targetComp.dataProvider[event.index].data;
+    	//	}	
 		]]>
 	</mx:Script>
 
@@ -515,7 +515,7 @@
 	    </mx:request>
     </mx:HTTPService>
 
-   <mx:HTTPService result="handleQueryResults(event);" fault="handleFault(event);" id="query" resultFormat="e4x"
+   <mx:HTTPService result="handleQueryResults(event);" fault="handleFault(event);" id="query" resultFormat="text"
     	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>query</func>
@@ -563,12 +563,14 @@
 					width="100%"
 					>
 					
+					<!--
 						<mx:TabBar itemClick="clickEvt(event);" id="queryResultsTab">
 						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
 						</mx:TabBar>
 			
 						<mx:TextArea id="forClick" height="75%" width="75%"/>
-
+						-->
+							<mx:Label text="Lucene Results:" />
 							<mx:TextArea id="queryResultsStringField" width="400" height="300"
 							text="">
 							</mx:TextArea>

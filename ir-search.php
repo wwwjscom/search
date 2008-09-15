@@ -38,8 +38,11 @@ class Functions {
 				$this->query();
 				break;
 			case "queryLucene":
-				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
+				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/tbindex/ -queries /tmp/query -results /tmp/res.out');
 				echo($java);
+				break;
+			case "queryLucid":
+				echo $this->queryLucidWeb($query);
 				break;
 		}
 	}
@@ -50,15 +53,26 @@ class Functions {
 	 */
 	public function queryLucene()
 	{
-		$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trec67index/ -queries /tmp/query -results /tmp/res.out');
+		$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/tbindex/ -queries /tmp/query -results /tmp/res.out');
 		//echo($java);
 		return $java;
 	}
 
+	public function queryLucidWeb($query)
+	{
+		$url = "/usr/bin/curl --get q=$query ttp://delirium:8888/focus/search/search?q=$query > /tmp/lawl";
+		$results = shell_exec($url);
+		echo shell_exec($url);
+		return $results;
+	}
+
 	public function queryLucid($query)
 	{
-		$java = shell_exec('/mnt/deliriumdata/prymek/LucidFocus/trec/query.sh -p dismax.properties -y "'. $query .'" -r results');
-		return $java;
+		//$java = shell_exec('/mnt/deliriumdata/prymek/LucidFocus/trec/query.sh -p dismax.properties -y "'. $query .'" -r results');
+		//$java = shell_exec('cd /mnt/deliriumdata/prymek/LucidFocus/trec/; ./query.sh -p dismax.properties -q /tmp/LucidFocusQueries -r results');
+		shell_exec('sh /var/www/QueryBuilder/LucidFocusQuerier.sh');
+		$results = $this->fileRead('/var/www/QueryBuilder/results_dismax.properties.out');
+		return $results;
 	}
 
 	public function query()
@@ -70,8 +84,8 @@ class Functions {
 		$input = $this->loop($xml); // Problem is in here?
 		$this->setInput($input);
 
-		$this->setName("FUCKKKKKK"); // Filename is correctly set
-		$this->addConcept(); // Contents are correctly written
+		//$this->setName("FUCKKKKKK"); // Filename is correctly set
+		//$this->addConcept(); // Contents are correctly written
 
 		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
 		/* BUG HERE!!!!! We must correctly format the query before writing it to the file */
@@ -83,6 +97,7 @@ class Functions {
 		$luceneResults = $this->queryLucene();
 
 		$lucidResults = $this->queryLucid($input);
+		//$lucidResults = $this->queryLucidWeb($input);
 
 		/**********************
 		 * Insert other query methods here
@@ -124,7 +139,7 @@ class Functions {
 				if($label == "ALL")
 					$input .= $this->loop($child);
 				else if($label == "NOT" && count($child->children())>1) {
-					//$input .= $label . " ";
+					$input .= $label . " ";
 					$input .= $this->loop($child);
 				} else {
 					// This pretty much doesn't do anything until we implement custom folders
