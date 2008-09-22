@@ -399,11 +399,42 @@
 		import mx.rpc.events.ResultEvent;
 		import mx.rpc.events.FaultEvent;
 
+
+
+
+
+
 	   [Bindable]
 	   private var allConcepts:XMLList;
 	   private var queryResults:XMLList;
-	   private var queryResultsString:String;
+
+	   public var queryResultsString:String = null;
 	   private var conceptData:XMLList;
+
+
+
+
+		/************************************
+		 *  All data for the tabbed query state
+		 ************************************/
+            import mx.events.ItemClickEvent;
+            import mx.controls.TabBar;
+
+		/* PARSE QUERYRESULTS XML AND SET EACH CHILD NODE TO THE
+		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
+            [Bindable]
+            public var queryResultsArray:Array = [
+								{label:"Lucid", data:"Loading results..."},
+                {label:"Oracle", data:"Loading results..."},
+                {label:"Lucene", data:"Loading results..."}
+            ];
+            
+    		private function clickEvt(event:ItemClickEvent):void {
+    			// Access target TabBar control.
+    			var targetComp:TabBar = TabBar(event.currentTarget);
+    			forClick.text = targetComp.dataProvider[event.index].data;
+    		}
+
 
 	        public function handleXML(event:ResultEvent):void
             {
@@ -412,13 +443,20 @@
             }
 
 	    /* Handles the query XML results */
-	    public function handleQueryResults(event:ResultEvent):void
-            {
-                queryResults = event.result as XMLList;
-                queryResultsString = event.result.toString();
-								queryResultsStringField.text = event.result.toString();
-            }
+	    public function handleLucidResults(event:ResultEvent):void
+			{
+					queryResultsArray[0]["data"] = event.result.toString();
+			}
 
+	    public function handleOracleResults(event:ResultEvent):void
+			{
+					queryResultsArray[1]["data"] = event.result.toString();
+			}	    
+
+			public function handleLuceneResults(event:ResultEvent):void
+			{
+					queryResultsArray[2]["data"] = event.result.toString();
+			}
 
 	        public function handleFault(event:FaultEvent):void
 	        {
@@ -454,30 +492,7 @@
                 <item label="Child Two" />
             </item>;
 
-
-
-
-		/************************************
-		 *  All data for the tabbed query state
-		 ************************************/
-            import mx.events.ItemClickEvent;
-            import mx.controls.TabBar;
-
-		/* PARSE QUERYRESULTS XML AND SET EACH CHILD NODE TO THE
-		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
-            [Bindable]
-            public var queryResultsArray:Array = [{label:"Lucid", data:queryResultsString},
-                {label:"Oracle", data:"lawl"},
-                {label:"Lucene", data:"lawl"}
-            ];
-            
-    	//	private function clickEvt(event:ItemClickEvent):void {
-    	//		// Access target TabBar control.
-    	//		var targetComp:TabBar = TabBar(event.currentTarget);
-    	//		forClick.text="label is: " + event.label + ", index is: " + 
-    	//			event.index + ", capital is: " +
-    	//			targetComp.dataProvider[event.index].data;
-    	//	}	
+	
 		]]>
 	</mx:Script>
 
@@ -515,15 +530,29 @@
 	    </mx:request>
     </mx:HTTPService>
 
-   <mx:HTTPService result="handleQueryResults(event);" fault="handleFault(event);" id="query" resultFormat="text"
+   <mx:HTTPService result="handleLucidResults(event);" fault="handleFault(event);" id="queryLucid" resultFormat="text"
     	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
-		<func>query</func>
+		<func>queryLucid</func>
 		<input>{treeData}</input>
 	    </mx:request>
     </mx:HTTPService>
 
+   <mx:HTTPService result="handleOracleResults(event);" fault="handleFault(event);" id="queryOracle" resultFormat="text"
+    	method="GET" url="ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>queryOracle</func>
+		<input>{treeData}</input>
+	    </mx:request>
+    </mx:HTTPService>
 
+   <mx:HTTPService result="handleLuceneResults(event);" fault="handleFault(event);" id="queryLucene" resultFormat="text"
+    	method="GET" url="ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>queryLucene</func>
+		<input>{treeData}</input>
+	    </mx:request>
+    </mx:HTTPService>
 
 
     <mx:Glow id="glowImage" duration="1000" 
@@ -563,17 +592,11 @@
 					width="100%"
 					>
 					
-					<!--
 						<mx:TabBar itemClick="clickEvt(event);" id="queryResultsTab">
 						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
 						</mx:TabBar>
 			
 						<mx:TextArea id="forClick" height="75%" width="75%"/>
-						-->
-							<mx:Label text="Lucene Results:" />
-							<mx:TextArea id="queryResultsStringField" width="400" height="300"
-							text="">
-							</mx:TextArea>
 					</mx:VBox>
 				</mx:target>
 			</mx:AddChild>
@@ -602,7 +625,7 @@
 						    dragMoveEnabled="true"
 						    dragComplete="onDragComplete(event)">
 						</mx:List>        
-					<mx:LinkButton id="QueryNOW" label="queryNOW" click="query.send();currentState='queryResults'"/>
+					<mx:LinkButton id="QueryNOW" label="queryNOW" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
 
 					</mx:HBox>
 				</mx:target>

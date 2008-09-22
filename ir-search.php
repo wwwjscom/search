@@ -38,11 +38,13 @@ class Functions {
 				$this->query();
 				break;
 			case "queryLucene":
-				$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/tbindex/ -queries /tmp/query -results /tmp/res.out');
-				echo($java);
+				echo $this->queryLucene();
 				break;
 			case "queryLucid":
-				echo $this->queryLucidWeb($query);
+				echo $this->queryLucid($query);
+				break;
+			case "queryOracle":
+				echo $this->fileRead('/mnt/kwakdata/prymek/trec67combined/progs/res.out');
 				break;
 		}
 	}
@@ -53,11 +55,55 @@ class Functions {
 	 */
 	public function queryLucene()
 	{
+
+		$myXML = stripslashes($this->getInput()); // Input is correctly received.
+
+		$xml = simplexml_load_string($myXML);
+
+		$input = $this->loop($xml); // Problem is in here?
+		$this->setInput($input);
+
+		//$this->setName("FUCKKKKKK"); // Filename is correctly set
+		//$this->addConcept(); // Contents are correctly written
+
+		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
+		/* BUG HERE!!!!! We must correctly format the query before writing it to the file */
+		$luceneInput 	= "<top>\n";
+		$luceneInput .= "<num> Number: 1\n";
+		$luceneInput .= "<title> $input\n";
+		$luceneInput .= "</top>\n";
+		$this->fileWrite($luceneInput, "/tmp/query");
+
+
+
 		$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/tbindex/ -queries /tmp/query -results /tmp/res.out');
 		//echo($java);
 		return $java;
 	}
 
+	public function buildLuceneQuery()
+	{
+		$myXML = stripslashes($this->getInput()); // Input is correctly received.
+
+		$xml = simplexml_load_string($myXML);
+
+		$input = $this->loop($xml); // Problem is in here?
+		$this->setInput($input);
+
+		//$this->setName("FUCKKKKKK"); // Filename is correctly set
+		//$this->addConcept(); // Contents are correctly written
+
+		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
+		/* BUG HERE!!!!! We must correctly format the query before writing it to the file */
+		$luceneInput 	= "<top>\n";
+		$luceneInput .= "<num> Number: 1\n";
+		$luceneInput .= "<title> $input\n";
+		$luceneInput .= "</top>\n";
+		$this->fileWrite($luceneInput, "/tmp/query");
+
+	}
+
+	/* Deprecated because curl wasn't returning anything... */
 	public function queryLucidWeb($query)
 	{
 		$url = "/usr/bin/curl --get q=$query ttp://delirium:8888/focus/search/search?q=$query > /tmp/lawl";
@@ -68,8 +114,6 @@ class Functions {
 
 	public function queryLucid($query)
 	{
-		//$java = shell_exec('/mnt/deliriumdata/prymek/LucidFocus/trec/query.sh -p dismax.properties -y "'. $query .'" -r results');
-		//$java = shell_exec('cd /mnt/deliriumdata/prymek/LucidFocus/trec/; ./query.sh -p dismax.properties -q /tmp/LucidFocusQueries -r results');
 		shell_exec('sh /var/www/QueryBuilder/LucidFocusQuerier.sh');
 		$results = $this->fileRead('/var/www/QueryBuilder/results_dismax.properties.out');
 		return $results;
@@ -103,21 +147,27 @@ class Functions {
 		 * Insert other query methods here
 		 *********************/
 
+		/* We do this for the time being since we can't connect to the DB for some reason.
+		When we are able to connect again we shouldn't hardcode the resluts, liek we do now */
+
+		$oracleResults = $this->fileRead('/mnt/kwakdata/prymek/trec67combined/progs/res.out');
+		//$oracleResults = $this->fileRead('/tmp/res.out');
 
 		/**********************
 		 * Build the results in XML
 		 **********************/
-		$queryXMLResults = $this->buildQueryResults($luceneResults, $lucidResults);
+		$queryXMLResults = $this->buildQueryResults($luceneResults, $lucidResults, $oracleResults);
 		echo $queryXMLResults;
 	}
 
 	/* Builds the query results as an XML list */
-	public function buildQueryResults($luceneResults, $lucidResults)
+	public function buildQueryResults($luceneResults, $lucidResults, $oracleResults)
 	{
 		$results  = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 		$results .= "<results>";
-		$results .= "<lucene>$luceneResults</lucene>";
+		$results .= "<oracle>$oracleResults</oracle>";
 		$results .= "<lucid>$lucidResults</lucid>";
+		$results .= "<lucene>$luceneResults</lucene>";
 		$results .= "</results>";
 		return $results;
 	}
