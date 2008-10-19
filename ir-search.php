@@ -41,7 +41,8 @@ class Functions {
 				echo $this->queryLucene();
 				break;
 			case "queryLucid":
-				echo $this->queryLucid($query);
+				echo $this->queryLucidWeb($query);
+				//echo $this->queryLucid($query);
 				break;
 			case "queryOracle":
 				echo $this->fileRead('/mnt/kwakdata/prymek/trec67combined/progs/res.out');
@@ -106,9 +107,23 @@ class Functions {
 	/* Deprecated because curl wasn't returning anything... */
 	public function queryLucidWeb($query)
 	{
-		$url = "/usr/bin/curl --get q=$query ttp://delirium:8888/focus/search/search?q=$query > /tmp/lawl";
-		$results = shell_exec($url);
-		echo shell_exec($url);
+		$myXML = stripslashes($this->getInput()); // Input is correctly received.
+
+		$xml = simplexml_load_string($myXML);
+
+		$input = $this->loop($xml); // Problem is in here?
+		$this->setInput($input);
+
+
+		$query = $this->getInput();
+
+		$query = urlencode($query);
+
+		$_resultsLoc = "/tmp/lawl";
+		$url = "/usr/bin/curl --data q=$query --get http://delirium:8888/focus/search/search > $_resultsLoc";
+		shell_exec($url);
+		$results = $this->fileRead($_resultsLoc);
+		//return "Query: $query";
 		return $results;
 	}
 
