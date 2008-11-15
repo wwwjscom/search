@@ -104,29 +104,38 @@ class Functions {
 
 	}
 
-	/* Deprecated because curl wasn't returning anything... */
+	/* See the queryLucid comments */
 	public function queryLucidWeb($query)
 	{
+		/* <Format Query> */
 		$myXML = stripslashes($this->getInput()); // Input is correctly received.
 
 		$xml = simplexml_load_string($myXML);
 
 		$input = $this->loop($xml); // Problem is in here?
 		$this->setInput($input);
-
+		/* </Format Query> */
 
 		$query = $this->getInput();
+
+		$RESULTS_PER_PAGE = 1;
 
 		$query = urlencode($query);
 
 		$_resultsLoc = "/tmp/lawl";
-		$url = "/usr/bin/curl --data q=$query --get http://delirium:8888/focus/search/search > $_resultsLoc";
+		/* BUG -- it appaers that the rows parameter is being ignored -- makes me believe
+		 * it will also ignore other parameters... */
+		$url = "/usr/bin/curl -d q=$query -d rows=$RESULTS_PER_PAGE --get http://delirium:8888/focus/search/search > $_resultsLoc";
 		shell_exec($url);
 		$results = $this->fileRead($_resultsLoc);
 		//return "Query: $query";
 		return $results;
 	}
 
+	/* Deprecated by LucidWeb -- if we can get the hit.vm
+	 * template file to work out then we should be able to
+	 * mod everything which is returned to us, thus allowing
+	 * us to completely control the results interface of Lucid */
 	public function queryLucid($query)
 	{
 		shell_exec('sh /var/www/QueryBuilder/LucidFocusQuerier.sh');
