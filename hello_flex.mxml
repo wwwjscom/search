@@ -423,7 +423,7 @@
 						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
 						</mx:TabBar>
 			
-						<mx:TextArea id="forClick" height="75%" width="75%"/>
+						<mx:TextArea id="forClick" height="100%" width="100%"/>
 					</mx:VBox>
 				</mx:target>
 			</mx:AddChild>
