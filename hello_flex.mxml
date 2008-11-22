@@ -257,11 +257,11 @@
 		/* PARSE QUERYRESULTS XML AND SET EACH CHILD NODE TO THE
 		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
             [Bindable]
-            public var queryResultsArray:ArrayCollection = new ArrayCollection ([
+            public var queryResultsArray:Array = [
 								{label:"Lucid", data:"Loading results..."},
                 {label:"Oracle", data:"Loading results..."},
                 {label:"Lucene", data:"Loading results..."}
-            ]);
+            ];
             
 
 				[Bindable]
@@ -277,6 +277,7 @@
     			//forClick.text = targetComp.dataProvider[event.index].data;
     			//resultsArray = targetComp.dataProvider[event.index].data;
 					//resultsGrid.dataProvider = queryResultsArray.getItemAt(targetComp.dataProvider[event.index]);
+					resultsGrid.dataProvider = queryResultsArray[index]["data"];
 					debugArea.text = index.toString();
     		}
 
@@ -290,6 +291,7 @@
 	    /* Handles the query XML results */
 	    public function handleLucidResults(event:ResultEvent):void
 			{
+          queryResultsArray[0]["data"] = event.result.doc;
 					//queryResultsArray.getItemAt(0).data = event.result.toString();
 					//queryResultsArray.addItemAt(event.result.toString(), 0);
 			}
@@ -307,6 +309,7 @@
 					//queryResultsArray.addItemAt(event.result.doc, 2);
 					//debugArea.text = event.result.data.results;
 					resultsGrid.dataProvider = event.result.doc;
+          queryResultsArray[2]["data"] = event.result.doc;
 					//debugArea.text = event.result.toString();
 			}
 
