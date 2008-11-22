@@ -38,7 +38,8 @@ class Functions {
 				$this->query();
 				break;
 			case "queryLucene":
-				echo $this->queryLucene();
+				$results = $this->queryLucene();
+				echo $this->luceneResultsToXML($results);
 				break;
 			case "queryLucid":
 				echo $this->queryLucidWeb($query);
@@ -73,6 +74,27 @@ class Functions {
 		$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trecindex/ -queries /tmp/query -results /tmp/res.out -quiet');
 		//echo($java);
 		return $java;
+	}
+
+
+	private function luceneResultsToXML($results)
+	{
+
+		$resArr = explode(';;', $results);
+
+		$retXML = "<results>\n";
+
+		for($i=0; $i < sizeOf($resArr); $i += 3)
+		{
+			$retXML .= "<doc>\n
+									<docno>".$resArr[$i]."</docno>\n
+									<title>".$resArr[$i+1]."</title>\n
+									<score>".$resArr[$i+2]."</score>\n
+								</doc>\n";
+		}
+
+		$retXML .= "</results>";
+		echo $retXML;
 	}
 
 	public function buildLuceneQuery()
