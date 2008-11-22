@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 	layout="horizontal"
+	xmlns:local="*"
 	backgroundColor="black"
 	creationComplete="initApp();initCollections();getAllConcepts.send()"
 	>
@@ -595,12 +596,25 @@
 						<mx:TabBar itemClick="clickEvt(event);" id="queryResultsTab">
 						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
 						</mx:TabBar>
+
+						<mx:TabNavigator id="tab"
+								width="100%"
+								height="100%">
+
+								<local:IFrame id="test1"
+									label="Lucid"
+									source="http://delirium:8888/focus/search/search?q=News"
+									width="100%"
+									height="100%"
+									/>
+
+						</mx:TabNavigator>
 			
 						<mx:TextArea id="forClick" height="75%" width="75%"/>
 					</mx:VBox>
 				</mx:target>
 			</mx:AddChild>
-			<mx:SetProperty target="{loginPanel}" name="title" value="Query Results"/>
+			<mx:SetProperty target="{loginPanel}" name="title" value="Query Results 2"/>
 		</mx:State>
 
 		<mx:State name="showQuery">
@@ -624,7 +638,7 @@
 						    dragEnabled="true"
 						    dragMoveEnabled="true"
 						    dragComplete="onDragComplete(event)">
-						</mx:List>        
+						</mx:List>
 					<mx:LinkButton id="QueryNOW" label="queryNOW" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
 
 					</mx:HBox>
