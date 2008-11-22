@@ -257,16 +257,24 @@
 		/* PARSE QUERYRESULTS XML AND SET EACH CHILD NODE TO THE
 		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
             [Bindable]
-            public var queryResultsArray:Array = [
+            public var queryResultsArray:ArrayCollection = new ArrayCollection ([
 								{label:"Lucid", data:"Loading results..."},
                 {label:"Oracle", data:"Loading results..."},
                 {label:"Lucene", data:"Loading results..."}
-            ];
+            ]);
             
+
+				[Bindable]
+				private var resultsArray:ArrayCollection;
+				private var LuceneResults:ArrayCollection;
+
+
     		private function clickEvt(event:ItemClickEvent):void {
     			// Access target TabBar control.
     			var targetComp:TabBar = TabBar(event.currentTarget);
-    			forClick.text = targetComp.dataProvider[event.index].data;
+    			//forClick.text = targetComp.dataProvider[event.index].data;
+    			//resultsArray = targetComp.dataProvider[event.index].data;
+					//resultsGrid.dataProvider = queryResultsArray.getItemAt(2);
     		}
 
 
@@ -279,17 +287,24 @@
 	    /* Handles the query XML results */
 	    public function handleLucidResults(event:ResultEvent):void
 			{
-					queryResultsArray[0]["data"] = event.result.toString();
+					//queryResultsArray.getItemAt(0).data = event.result.toString();
+					queryResultsArray.addItemAt(event.result.toString(), 0);
 			}
 
 	    public function handleOracleResults(event:ResultEvent):void
 			{
-					queryResultsArray[1]["data"] = event.result.toString();
+					//queryResultsArray.getItemAt(1).data = event.result.toString();
+					queryResultsArray.addItemAt(event.result.toString(), 1);
 			}	    
 
 			public function handleLuceneResults(event:ResultEvent):void
 			{
-					queryResultsArray[2]["data"] = event.result.toString();
+					//queryResultsArray.getItemAt(2).data = event.result.data.results;
+					//queryResultsArray.setItemAt(event.result.data.results, 2);
+					queryResultsArray.addItemAt(event.result.doc, 2);
+					//debugArea.text = event.result.data.results;
+					resultsGrid.dataProvider = event.result.doc;
+					//debugArea.text = event.result.toString();
 			}
 
 	        public function handleFault(event:FaultEvent):void
@@ -310,14 +325,13 @@
 		}
 		//<name>{editThisConcept.selectedLabel}</name>
 
-
-            [Bindable]
+						[Bindable]
             private var dataX:XML =
-                <item label="Top">
-
-                <item label="Child One"/>
-                <item label="Child Two" />
-            </item>;
+								<results>
+									<doc>
+									<docno>1</docno>
+									</doc>
+								</results>;
 
 	
 		]]>
@@ -373,7 +387,7 @@
 	    </mx:request>
     </mx:HTTPService>
 
-   <mx:HTTPService result="handleLuceneResults(event);" fault="handleFault(event);" id="queryLucene" resultFormat="text"
+   <mx:HTTPService result="handleLuceneResults(event);" fault="handleFault(event);" id="queryLucene" resultFormat="e4x"
     	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>queryLucene</func>
@@ -423,12 +437,27 @@
 						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
 						</mx:TabBar>
 			
-						<mx:TextArea id="forClick" height="100%" width="100%"/>
+						<mx:DataGrid id="resultsGrid"
+							width="100%"
+							height="100%"
+							>
+							<mx:columns>
+								<mx:DataGridColumn headerText="DocNo"
+									dataField="docno"/>
+								<mx:DataGridColumn headerText="Title"
+									dataField="title"/>
+								<mx:DataGridColumn headerText="Hit Score"
+									dataField="score"/>
+							</mx:columns>
+						</mx:DataGrid>
+						<mx:TextArea id="debugArea" />
+
 					</mx:VBox>
 				</mx:target>
 			</mx:AddChild>
 			<mx:SetProperty target="{loginPanel}" name="title" value="Query Results 2"/>
 		</mx:State>
+		<!-- End Query Results State -->
 
 		<mx:State name="showQuery">
 			<mx:AddChild relativeTo="{loginPanel}" position="lastChild">

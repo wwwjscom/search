@@ -39,7 +39,8 @@ class Functions {
 				break;
 			case "queryLucene":
 				$results = $this->queryLucene();
-				echo $this->luceneResultsToXML($results);
+				//echo $this->luceneResultsToXML($results);
+				echo $this->fileRead('/tmp/lucene.xml');
 				break;
 			case "queryLucid":
 				echo $this->queryLucidWeb($query);
@@ -86,11 +87,7 @@ class Functions {
 
 		for($i=0; $i < sizeOf($resArr); $i += 3)
 		{
-			$retXML .= "<doc>\n
-									<docno>".$resArr[$i]."</docno>\n
-									<title>".$resArr[$i+1]."</title>\n
-									<score>".$resArr[$i+2]."</score>\n
-								</doc>\n";
+			$retXML .= "<doc>\n<docno>".$resArr[$i]."</docno>\n<title>".$resArr[$i+1]."</title>\n<score>".$resArr[$i+2]."</score>\n</doc>\n";
 		}
 
 		$retXML .= "</results>";
