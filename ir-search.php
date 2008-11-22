@@ -39,8 +39,7 @@ class Functions {
 				break;
 			case "queryLucene":
 				$results = $this->queryLucene();
-				//echo $this->luceneResultsToXML($results);
-				echo $this->fileRead('/tmp/lucene.xml');
+				echo $this->luceneResultsToXML($results);
 				break;
 			case "queryLucid":
 				echo $this->queryLucidWeb($query);
