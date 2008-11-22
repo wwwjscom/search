@@ -272,9 +272,12 @@
     		private function clickEvt(event:ItemClickEvent):void {
     			// Access target TabBar control.
     			var targetComp:TabBar = TabBar(event.currentTarget);
+
+					var index:int = event.index;
     			//forClick.text = targetComp.dataProvider[event.index].data;
     			//resultsArray = targetComp.dataProvider[event.index].data;
-					//resultsGrid.dataProvider = queryResultsArray.getItemAt(2);
+					//resultsGrid.dataProvider = queryResultsArray.getItemAt(targetComp.dataProvider[event.index]);
+					debugArea.text = index.toString();
     		}
 
 
@@ -288,20 +291,20 @@
 	    public function handleLucidResults(event:ResultEvent):void
 			{
 					//queryResultsArray.getItemAt(0).data = event.result.toString();
-					queryResultsArray.addItemAt(event.result.toString(), 0);
+					//queryResultsArray.addItemAt(event.result.toString(), 0);
 			}
 
 	    public function handleOracleResults(event:ResultEvent):void
 			{
 					//queryResultsArray.getItemAt(1).data = event.result.toString();
-					queryResultsArray.addItemAt(event.result.toString(), 1);
+					//queryResultsArray.addItemAt(event.result.toString(), 1);
 			}	    
 
 			public function handleLuceneResults(event:ResultEvent):void
 			{
 					//queryResultsArray.getItemAt(2).data = event.result.data.results;
 					//queryResultsArray.setItemAt(event.result.data.results, 2);
-					queryResultsArray.addItemAt(event.result.doc, 2);
+					//queryResultsArray.addItemAt(event.result.doc, 2);
 					//debugArea.text = event.result.data.results;
 					resultsGrid.dataProvider = event.result.doc;
 					//debugArea.text = event.result.toString();
