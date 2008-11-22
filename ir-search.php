@@ -57,15 +57,8 @@ class Functions {
 	public function queryLucene()
 	{
 
-		$myXML = stripslashes($this->getInput()); // Input is correctly received.
-
-		$xml = simplexml_load_string($myXML);
-
-		$input = $this->loop($xml); // Problem is in here?
+		$input = stripslashes($this->getInput()); // Input is correctly received.
 		$this->setInput($input);
-
-		//$this->setName("FUCKKKKKK"); // Filename is correctly set
-		//$this->addConcept(); // Contents are correctly written
 
 		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
 		/* BUG HERE!!!!! We must correctly format the query before writing it to the file */

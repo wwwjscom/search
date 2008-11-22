@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 	layout="horizontal"
-	xmlns:local="*"
 	backgroundColor="black"
 	creationComplete="initApp();initCollections();getAllConcepts.send()"
 	>
@@ -231,172 +230,6 @@
 		// Stop Drag and Drop
 		//------------------------
 
-
-
-		//------------------------
-		// Start Tree Code
-		//------------------------
-	    import mx.events.DragEvent;
-            import mx.managers.DragManager;
-            import mx.core.DragSource;
-            import mx.core.UIComponent;
-            import mx.controls.Tree;
-            /**
-             * Called as soon as the dragProxy enters the target. You can add logic
-             * to determine if the target will accept the drop based on the
-             * dragInitiator, the data available in the dragSource.
-             * Here the drop is blindly accepted.
-             */
-
-            private function onDragEnter( event:DragEvent ) : void
-
-            {
-                DragManager.acceptDragDrop(UIComponent(event.currentTarget));
-            }
-            /**
-             * Called while the dragProxy is over the drop target. You can
-             * use this function to determine the type of feedback to show.
-             * Since the List is set to allow MOVE (the item is deleted
-             * once dropped), different feedback possibilities are given.
-             *
-             * Also, for this application, the Tree control node the dragProxy is
-             * over is selected. As the dragProxy moves, the Tree control's
-             * selection changes.
-             *
-             * For a bit more complication, the drop is being allowed
-             * only over nodes whose type is NOT 'state'.
-             * The feedback is removed.
-             */
-            private function onDragOver( event:DragEvent ) : void
-
-            {
-                var dropTarget:Tree = Tree(event.currentTarget);
-                var r:int = dropTarget.calculateDropIndex(event);
-                tree.selectedIndex = r;
-                var node:XML = tree.selectedItem as XML;
-                if( node.@type == "state" ) {
-
-                    DragManager.showFeedback(DragManager.NONE);
-                    return;
-                }
-                if (event.ctrlKey)
-
-                    DragManager.showFeedback(DragManager.COPY);
-                else if (event.shiftKey)
-                    DragManager.showFeedback(DragManager.LINK);
-                else {
-
-                    DragManager.showFeedback(DragManager.MOVE);
-                }
-            }
-            /**
-             * Called when the dragProxy is released
-             * over the drop target. The information in the dragSource
-             * is extracted and processed.
-             *
-             * The target node is determined and 
-            * all of the data selected (the List has allowMultipleSection
-            * set) is added.
-             */
-            private function onDragDrop( event:DragEvent ) : void
-
-            {
-                var ds:DragSource = event.dragSource;
-                var dropTarget:Tree = Tree(event.currentTarget);
-                var items:Array = ds.dataForFormat("items") as Array;
-                var r:int = tree.calculateDropIndex(event);
-                tree.selectedIndex = r;
-                var node:XML = tree.selectedItem as XML;
-                var p:*;
-                // if the selected node has children (it is type==city),
-
-                // then add the items at the beginning
-                if( tree.dataDescriptor.hasChildren(node) ) {
-                    p = node;
-                    r = 0;
-                } else {
-
-                    p = node.parent();
-                }
-                for(var i:Number=0; i < items.length; i++) {
-
-                    var insert:XML = <node />;
-                    insert.@label = items[i];
-                    insert.@type  = "restaurant";
-                    tree.dataDescriptor.addChildAt(p, insert, r+i);
-                }
-
-            }
-            /**
-             * Called when the drag operation completes, whether 
-             * successfully or not. The tree is cleared of its
-             * selection.
-             */
-            private function onDragComplete( event:DragEvent ) : void
-
-            {
-                tree.selectedIndex = -1;
-            }        
-
-
-	    import mx.collections.XMLListCollection;
-            
-            [Bindable]
-            private var company:XML =
-              <list>
-                <department title="Finance" code="200">
-                    <employee name="John H"/>
-                    <employee name="Sam K"/>
-                </department>
-                <department title="Operations" code="400">
-                    <employee name="Bill C"/>
-                    <employee name="Jill W"/>
-                </department>                    
-                <department title="Engineering" code="300">
-                    <employee name="Erin M"/>
-                    <employee name="Ann B"/>
-                </department>                                
-              </list>;
-
-            [Bindable]
-
-            private var companyData:XMLListCollection = new XMLListCollection(company.department);
-            
-            private function treeLabel(item:Object):String
-            {
-
-                var node:XML = XML(item);
-                if( node.localName() == "department" )
-
-                    return node.@title;
-                else
-                    return node.@name;
-            }
-
-           // private function addEmployee():void
-           // {
-	   //     var term:XML = 
-	   //     	<list>
-	   //     		<concept title="empName.text"/>
-	   //     	</list>;
-           // 	var termData:XMLListCollection = new XMLListCollection(term.concept);
-
-	   //     conceptsArray.addItem(termData);
-	   //     //query.dataProvider.addItem(empName.text);
-           //     var newNode:XML = <employee/>;
-           //     newNode.@name = empName.text;
-           //     var dept:XMLList =company.department.(@title == "Operations");
-           //     if( dept.length() > 0 ) {
-
-           //         dept[0].appendChild(newNode);
-           //         empName.text = "";
-           //     }
-           // }
-
-		//---------------------
-		// End Tree Code
-		//---------------------
-
 		import mx.rpc.events.ResultEvent;
 		import mx.rpc.events.FaultEvent;
 
@@ -478,13 +311,6 @@
 		//<name>{editThisConcept.selectedLabel}</name>
 
 
-            private function addEmptyBranch():void
-            {
-                var newNode:XML = <item label='Middle' isBranch="true"></item>;
-                tree.dataProvider.addItemAt(newNode, 0);
-            }
-
-
             [Bindable]
             private var dataX:XML =
                 <item label="Top">
@@ -535,7 +361,7 @@
     	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>queryLucid</func>
-		<input>{treeData}</input>
+		<input>{queryString.text}</input>
 	    </mx:request>
     </mx:HTTPService>
 
@@ -543,7 +369,7 @@
     	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>queryOracle</func>
-		<input>{treeData}</input>
+		<input>{queryString.text}</input>
 	    </mx:request>
     </mx:HTTPService>
 
@@ -551,7 +377,7 @@
     	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>queryLucene</func>
-		<input>{treeData}</input>
+		<input>{queryString.text}</input>
 	    </mx:request>
     </mx:HTTPService>
 
@@ -596,19 +422,6 @@
 						<mx:TabBar itemClick="clickEvt(event);" id="queryResultsTab">
 						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
 						</mx:TabBar>
-
-						<mx:TabNavigator id="tab"
-								width="100%"
-								height="100%">
-
-								<local:IFrame id="test1"
-									label="Lucid"
-									source="http://delirium:8888/focus/search/search?q=News"
-									width="100%"
-									height="100%"
-									/>
-
-						</mx:TabNavigator>
 			
 						<mx:TextArea id="forClick" height="75%" width="75%"/>
 					</mx:VBox>
@@ -622,23 +435,12 @@
 				<mx:target>
 					<mx:HBox>
 						<mx:Label text="Query" left="10" top="10"/>
-						<mx:Tree height="100%" width="186" left="10" top="30" bottom="10" id="tree"
-						    labelField="@label"
-						    dataProvider="{treeData.node}"
-						    dropEnabled="false"
-						    dragMoveEnabled="false"
-						    dragEnter="onDragEnter(event)"
-						    dragOver="onDragOver(event)"
-						    dragDrop="onDragDrop(event)">
-						</mx:Tree>    
-						<mx:Label text="Concepts" right="5" top="10"/>
-						<mx:List width="188" height="206" right="10" top="30" id="concepts"
-							dataProvider="{allConcepts}"
-						    allowMultipleSelection="true"
-						    dragEnabled="true"
-						    dragMoveEnabled="true"
-						    dragComplete="onDragComplete(event)">
-						</mx:List>
+
+						<mx:TextArea width="100%" height="100%" id="queryString">
+						    <mx:text>
+						    </mx:text>
+						</mx:TextArea>
+
 					<mx:LinkButton id="QueryNOW" label="queryNOW" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
 
 					</mx:HBox>
