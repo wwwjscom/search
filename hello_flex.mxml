@@ -3,6 +3,7 @@
 	layout="horizontal"
 	backgroundColor="black"
 	creationComplete="initApp();initCollections();getAllConcepts.send()"
+	keyDown="keyHandler(event)"
 	>
 
 	<mx:Script>
@@ -121,11 +122,40 @@
             import mx.managers.DragManager;
             import mx.events.DragEvent;
             import mx.collections.ArrayCollection;
+
+						import flash.events.KeyboardEvent;
+
+						[Bindable] 
+						private var prevKeys:Array = new Array();
+
+						private function keyHandler(event:KeyboardEvent):void
+						{
+							var key:String = String.fromCharCode(event.keyCode);
+							var keyCode:int = event.keyCode;
+							debugArea.text = keyCode.toString();
+							
+							if (keyCode == 221)
+							{
+								/* Empty out the array -- hurray for no empty method...fucking flex */
+								prevKeys = [];
+								debugArea.text = "CLEAR";
+							}
+							else if(keyCode == 219 || prevKeys.length > 0)
+							{
+								if(keyCode > 47 && keyCode < 91 || keyCode == 219)
+								{
+									prevKeys.push(key);
+								}
+								debugArea.text = prevKeys.toString();
+							}
+						}
     
 		[Bindable]
 		public var conceptsArray:ArrayCollection = new ArrayCollection([]);
 
             private function initApp():void {
+	//							stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);	
+
              //   firstList.dataProvider = new ArrayCollection([
              //       {label:"(", data:"("},
              //       {label:")", data:")"},
@@ -149,6 +179,12 @@
 	//		{label:"50 cent", data:"50 cent"}
 	//		]);
             }
+
+
+	//private function keyDown(event:KeyboardEvent):void
+	//{
+	//	debugArea.text = (event.charCode).toString();
+	//}
 
 		[Bindable]
 		public var queryArray:ArrayCollection;
@@ -445,7 +481,6 @@
 									dataField="score"/>
 							</mx:columns>
 						</mx:DataGrid>
-						<mx:TextArea id="debugArea" />
 
 					</mx:VBox>
 				</mx:target>
@@ -666,6 +701,7 @@
 	</mx:VBox>
 
 	<mx:VBox id="col2">
+						<mx:TextArea id="debugArea" />
 	</mx:VBox>
     </mx:Panel>
 
@@ -695,4 +731,6 @@ to isBranch and same in the PHP code -->
 </root>
 
 </mx:XML>    
+
+
 </mx:Application>
