@@ -125,6 +125,12 @@
 
 						import flash.events.KeyboardEvent;
 
+
+						public function handleTranslation(event:ResultEvent):void
+						{
+							debugArea.text = event.result.toString();
+						}
+
 						[Bindable] 
 						private var prevKeys:Array = new Array();
 
@@ -136,18 +142,29 @@
 							
 							if (keyCode == 221)
 							{
+
+								debugArea.text = prevKeys.toString();
+								translateToConcept.send();
+
 								/* Empty out the array -- hurray for no empty method...fucking flex */
 								prevKeys = [];
-								debugArea.text = "CLEAR";
+								//debugArea.text = "CLEAR";
+							}
+							else if(keyCode == 8)
+							/* User hit delete, so pop off the last char */
+							{
+								prevKeys.pop();
+								debugArea.text = prevKeys.toString();
 							}
 							else if(keyCode == 219 || prevKeys.length > 0)
 							{
-								if(keyCode > 47 && keyCode < 91 || keyCode == 219)
+								if(keyCode > 47 && keyCode < 91 || keyCode == 219 || keyCode == 32)
 								{
 									prevKeys.push(key);
 								}
 								debugArea.text = prevKeys.toString();
 							}
+							
 						}
     
 		[Bindable]
@@ -367,6 +384,15 @@
 	
 		]]>
 	</mx:Script>
+
+
+   <mx:HTTPService result="handleTranslation(event);" fault="handleFault(event);" id="translateToConcept" resultFormat="text"
+    	method="GET" url="ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>translateToConcept</func>
+		<input>{debugArea.text}</input>
+	    </mx:request>
+	</mx:HTTPService>
 
    <mx:HTTPService result="handleXMLUpdateEditForm(event);" fault="handleFault(event);" id="getConceptData" resultFormat="text"
     	method="GET" url="ir-search.php" useProxy="false">

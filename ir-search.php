@@ -48,7 +48,47 @@ class Functions {
 			case "queryOracle":
 				echo $this->fileRead('/mnt/kwakdata/prymek/trec67combined/progs/res.out');
 				break;
+			case "translateToConcept":
+				echo $this->translate_to_concept($this->getInput());
+				break;
 		}
+	}
+
+	/* If clean, we assume we are doing the final query, not playing
+	 * with the flex interface on keydown while user enters query */
+	public function translate_to_concept($concept_term, $clean = FALSE)
+	{
+		if( ! $clean)
+			$_preped_concept_term = strtolower(substr(ereg_replace(',', '', $concept_term), 2));
+		else
+			$_preped_concept_term = $concept_term;
+
+		$results = $this->fileRead('/var/www/QueryBuilder/concepts/wwwjscom/' . $_preped_concept_term . '.xml');
+
+		return $results;
+	}
+
+	public function translate_query($query)
+	{
+		$query = ' ' . $query; // Eliminates an error caused by a { being @ index 0, thus equating to false for the while statement below
+
+		while(strpos($query, '{') != FALSE)
+		{
+			//echo "Query: $query<br />"; // DEBUG
+
+			$_concept = substr($query, strpos($query, '{')+1, strpos($query, '}')-strpos($query, '{')-1);
+			$_concept = strtolower($_concept);
+
+			//$_concept = substr($query, strpos($query, '{'), strpos($query, '}') - strpos($query, '{'));
+
+			//echo "Concept: $_concept<br />"; // DEBUG
+
+			$_translated_concept = $this->translate_to_concept($_concept, TRUE);
+
+			$query = str_ireplace('{' . $_concept . '}', '(' . $_translated_concept . ')', $query);
+		}
+
+		return $query;
 	}
 
 	/* This function simply queries oracle.  The query must be written to /tmp/query.
@@ -59,6 +99,11 @@ class Functions {
 	{
 
 		$input = stripslashes($this->getInput()); // Input is correctly received.
+
+		$input = $this->translate_query($input); // Translate all of the {concepts} to TERM1 AND TERM2 etc
+
+		//echo "Query: $input"; // DEBUG
+
 		$this->setInput($input);
 
 		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
@@ -262,7 +307,7 @@ class Functions {
 	public function updateConceptData($fileName)
 	{
 		$path = "concepts/wwwjscom";
-		$pathAndFile = $path."/".$fileName.".xml";
+		$pathAndFile = $path."/" . strtolower($fileName) . ".xml";
 		unlink($pathAndFile);
 
 		$this->addConcept();
@@ -277,7 +322,7 @@ class Functions {
 	 */
 	public function getConceptData($filePathAndName, $return = false)
 	{
-		$myFile = "concepts/wwwjscom/".$this->getName().".xml";
+		$myFile = "concepts/wwwjscom/" . strtolower($this->getName()) . ".xml";
 
 		if($return === true)
 			return $this->fileRead($myFile);
@@ -347,7 +392,7 @@ class Functions {
 	public function fileWrite($input, $filename = null)
 	{
 		if($filename != null)
-			$myFile = $filename;
+			$myFile = strtolower($filename);
 		else
 			$myFile = "concepts/wwwjscom/".$this->getName().".xml";
 		$fh = fopen($myFile, 'w') or die("can't open file");
