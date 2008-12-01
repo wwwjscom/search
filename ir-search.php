@@ -20,6 +20,7 @@ class Functions {
 		switch($funcName)
 		{
 			case "addConcept":
+				//$this->setInput( $this->remove_car_ret( $this->getInput() ) ); // Clean the file
 				$this->addConcept();
 				break;
 			case "getAllConcepts":
@@ -87,6 +88,9 @@ class Functions {
 
 			$query = str_ireplace('{' . $_concept . '}', '(' . $_translated_concept . ')', $query);
 		}
+
+		// Remove all carriage returns
+		$query = $this->remove_car_ret($query);
 
 		return $query;
 	}
@@ -382,11 +386,17 @@ class Functions {
 		return $this->input;
 	}
 
+	/* Removes ^M (car returns) */
+	public function remove_car_ret($dirty)
+	{
+		$clean = preg_replace('/\x0D/', '', $dirty);
+		return $clean;
+	}
 
 	/* Concepts Class/Functions */
 	public function addConcept()
 	{
-		$this->setName(strtolower($this->getName()));
+		$this->setName(strtolower($this->getName())); // Make sure the filename is all lower case
 		$this->fileWrite($this->getInput());
 	}
 

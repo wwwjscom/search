@@ -163,7 +163,7 @@
 							}
 							else if(keyCode == 219 || prevKeys.length > 0)
 							{
-								if(keyCode > 47 && keyCode < 91 || keyCode == 219 || keyCode == 32 || keyCode == 189)
+								if(keyCode > 47 && keyCode < 91 || keyCode == 219 || keyCode == 32)
 								{
 									prevKeys.push(key);
 								}
@@ -628,8 +628,8 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 			<mx:AddChild relativeTo="{mainForm}" position="lastChild">
 				<mx:target>
 					<mx:HBox>
-						<mx:Label text="Concept Name: " />
-						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();Alert.show('Added');"/>
+						<mx:Label text="Concept Name (only ALPHA-NUM please): " />
+						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();Alert.show('Added');currentState='showQuery'"/>
 					</mx:HBox>
 				</mx:target>
 			</mx:AddChild>
