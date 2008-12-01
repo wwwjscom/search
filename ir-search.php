@@ -386,6 +386,7 @@ class Functions {
 	/* Concepts Class/Functions */
 	public function addConcept()
 	{
+		$this->setName(strtolower($this->getName()));
 		$this->fileWrite($this->getInput());
 	}
 
