@@ -579,7 +579,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 							<mx:TextArea id="editThisConceptField" width="400" height="300"
 							text="{editThisConcept.selectedItem.data}">
 							</mx:TextArea>
-							<mx:Button label="Update" click="updateConceptData.send();Alert.show('Updated');"/>
+							<mx:Button label="Update" click="updateConceptData.send();Alert.show('Updated');getAllConcepts.send();currentState='showQuery';"/>
 
 					</mx:Form>
 				</mx:target>
@@ -629,7 +629,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 				<mx:target>
 					<mx:HBox>
 						<mx:Label text="Concept Name (only ALPHA-NUM please): " />
-						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();Alert.show('Added');currentState='showQuery'"/>
+						<mx:TextInput id="newConceptName"/><mx:Button label="Add Concept!" click="addConcept.send();Alert.show('Added');getAllConcepts.send();currentState='showQuery'"/>
 					</mx:HBox>
 				</mx:target>
 			</mx:AddChild>
