@@ -2,7 +2,7 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 	layout="horizontal"
 	backgroundColor="black"
-	creationComplete="initApp();initCollections();getAllConcepts.send()"
+	creationComplete="initApp();initCollections();getAllConcepts.send();currentState='showQuery'"
 	keyDown="keyHandler(event)"
 	>
 
@@ -561,7 +561,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 						    </mx:text>
 						</mx:TextArea>
 
-					<mx:LinkButton id="QueryNOW" label="queryNOW" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
+					<mx:LinkButton id="QueryNOW" label="SEARCH" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
 
 					</mx:HBox>
 				</mx:target>
@@ -776,8 +776,8 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 	</mx:VBox>
 
 	<mx:VBox id="col2">
-						<mx:Label text="Debug Output:" />
-						<mx:TextArea id="debugArea" />
+						<mx:Label text="Debug Output:" width="0" height="0" />
+						<mx:TextArea id="debugArea" width="0" height="0" />
 	</mx:VBox>
     </mx:Panel>
 
