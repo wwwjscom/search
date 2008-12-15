@@ -113,11 +113,11 @@ class Functions {
 
 		/* Write the query to /tmp/query - this is for querying oracle, see queryOracle() */
 		/* BUG HERE!!!!! We must correctly format the query before writing it to the file */
-		$luceneInput 	= "<top>\n";
-		$luceneInput .= "<num> Number: 1\n";
-		$luceneInput .= "<title> $input\n";
-		$luceneInput .= "</top>\n";
-		$this->fileWrite($luceneInput, "/tmp/query");
+		//$luceneInput 	= "<top>\n";
+		//$luceneInput .= "<num> Number: 1\n";
+		//$luceneInput .= "<title> $input\n";
+		//$luceneInput .= "</top>\n";
+		//$this->fileWrite($luceneInput, "/tmp/query");
 
 
 
@@ -127,6 +127,11 @@ class Functions {
 		$java = shell_exec("/usr/local/bin/java -cp /mnt/bigfootdata/lucene/classes/:/mnt/bigfootdata/lucene/lib/lucene-analyzers-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/lucene-core-2.4.0.jar:/mnt/bigfootdata/lucene/lib/lucene-core-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/lucene-highlighter-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/lucene-queries-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/lucene-snowball-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/xercesImpl.jar edu/iit/ir/lucene/util/FlexHighlighter '$input'");
 		//echo($java);
 		//echo $this->fileRead("/tmp/res.out");
+
+		/* Clean out everything that makes us fail */
+		$java = preg_replace('</?CENTER>', '', $java);
+		$java = preg_replace("<>", '', $java);
+
 		return $java;
 	}
 
