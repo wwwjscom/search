@@ -39,8 +39,9 @@ class Functions {
 				$this->query();
 				break;
 			case "queryLucene":
-				$results = $this->queryLucene();
-				echo $this->luceneResultsToXML($results);
+				echo $this->queryLucene();
+				//$results = $this->queryLucene();
+				//echo $this->luceneResultsToXML($results);
 				break;
 			case "queryLucid":
 				echo $this->queryLucidWeb($query);
@@ -120,8 +121,12 @@ class Functions {
 
 
 
-		$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trecindex/ -queries /tmp/query -results /tmp/res.out -quiet');
+		//$java = shell_exec('/usr/local/bin/java -cp /mnt/bigfootdata/workspace2.4/2.4-dev/:/mnt/bigfootdata/workspace2.4/trec-parse/ -server -Xmx1g org/apache/lucene/search/AdvancedSearcher -index /mnt/bigfootdata/prymek/trecindex/ -queries /tmp/query -results /tmp/res.out -quiet');
+
+
+		$java = shell_exec("/usr/local/bin/java -cp /mnt/bigfootdata/lucene/classes/:/mnt/bigfootdata/lucene/lib/lucene-analyzers-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/lucene-core-2.4.0.jar:/mnt/bigfootdata/lucene/lib/lucene-core-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/lucene-highlighter-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/lucene-queries-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/lucene-snowball-2.4-dev.jar:/mnt/bigfootdata/lucene/lib/xercesImpl.jar edu/iit/ir/lucene/util/FlexHighlighter '$input'");
 		//echo($java);
+		//echo $this->fileRead("/tmp/res.out");
 		return $java;
 	}
 

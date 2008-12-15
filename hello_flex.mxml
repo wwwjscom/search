@@ -537,11 +537,22 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 								<mx:DataGridColumn headerText="DocNo"
 									dataField="docno"/>
 								<mx:DataGridColumn headerText="Title"
-									dataField="title"/>
-								<mx:DataGridColumn headerText="Hit Score"
-									dataField="score"/>
-							</mx:columns>
-						</mx:DataGrid>
+									dataField="title"
+									wordWrap="true"
+									/>
+								<mx:DataGridColumn headerText="Snippet"
+									wordWrap="true"
+									dataField="snippet">
+									<mx:itemRenderer>
+										<mx:Component>
+											<mx:TextArea htmlText="{data.snippet}"/>
+										</mx:Component>
+									</mx:itemRenderer>
+								</mx:DataGridColumn>
+									</mx:columns>
+
+									</mx:DataGrid>
+
 
 					</mx:VBox>
 				</mx:target>
@@ -676,7 +687,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
 			<mx:RemoveChildAction/>
 			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
-			<mx:Resize target="{loginPanel}" heightTo="450" widthTo="500"/>
+			<mx:Resize target="{loginPanel}" heightTo="700" widthTo="800"/>
 			<mx:AddChildAction/>
 		    </mx:Sequence>
 		</mx:Transition>
