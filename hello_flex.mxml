@@ -9,6 +9,44 @@
 	<mx:Script>
 		<![CDATA[
 
+		//-----------------------------
+		//   <Popup Code> 
+		//----------------------------
+
+
+
+		/* Dispatches an HTTP request to find get the translated
+		 * query for a specific engine (currently all engines use
+		 * the same query, so we do not specify an engine 
+		 */
+		private function showQuery(evt:MouseEvent):void {
+
+			/* The engine var is not currently used, but can be useful
+			 * later when each engine needs a custom query instead of
+			 * all engines having the same query. 
+			 */
+			var engine:String = evt.target.label;
+
+			getQuery.send();
+		}
+
+
+
+		/* 
+		 * This function gets the data back from the HTTP call
+		 * and displays the query in the pop-up box.
+		 */
+		public function displayQuery(query:ResultEvent):void {
+
+			Alert.show("Query: " + query.result.toString());
+		}
+
+
+
+		//-----------------------------
+		//   </Popup Code> 
+		//----------------------------
+
 
 		//-----------------------------
 		//    Menu Code
@@ -211,10 +249,6 @@
 		[Bindable]
 		public var queryArray:ArrayCollection;
 		//public var queryArray:Array;
-
-		public function getQuery():void {
-			;
-		}
 
 		private function setQuery():void {
 			//query.dataProvider.addItem(newConceptString);
@@ -457,6 +491,13 @@
 	    </mx:request>
     </mx:HTTPService>
 
+   <mx:HTTPService result="displayQuery(event);" fault="handleFault(event);" id="getQuery" resultFormat="text"
+    	method="GET" url="ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>translateQuery</func>
+		<input>{queryString.text}</input>
+	    </mx:request>
+    </mx:HTTPService>
 
     <mx:Glow id="glowImage" duration="1000" 
         alphaFrom="1.0" alphaTo="0.3" 
@@ -524,7 +565,15 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 					height="100%"
 					width="100%"
 					>
-					
+	
+						<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
+               paddingLeft="10" paddingRight="10">
+							<mx:Label text="Show query for: " />
+							<mx:Button label="Lucid" click="showQuery(event)" />
+							<mx:Button label="Oracle" click="showQuery(event)" />
+							<mx:Button label="Lucene" click="showQuery(event)" />
+						</mx:HBox>				
+
 						<mx:TabBar itemClick="clickEvt(event);" id="queryResultsTab">
 						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
 						</mx:TabBar>
@@ -535,8 +584,10 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 							>
 							<mx:columns>
 								<mx:DataGridColumn headerText="DocNo"
+									width="70"
 									dataField="docno"/>
 								<mx:DataGridColumn headerText="Title"
+									width="175"
 									dataField="title"
 									wordWrap="true"
 									/>
@@ -564,17 +615,27 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 		<mx:State name="showQuery">
 			<mx:AddChild relativeTo="{loginPanel}" position="lastChild">
 				<mx:target>
-					<mx:HBox width="100%" height="100%">
-						<mx:Label text="Query" left="10" top="10"/>
+					<mx:VBox width="100%" height="100%">
+						<!--<mx:Label text="Query" left="10" top="10"/>-->
 
+						<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
+               paddingLeft="10" paddingRight="10">
+							<mx:Label text="Show query for: " />
+							<mx:Button label="Lucid" click="showQuery(event)" />
+							<mx:Button label="Oracle" click="showQuery(event)" />
+							<mx:Button label="Lucene" click="showQuery(event)" />
+						</mx:HBox>
+
+						<mx:HBox width="100%" height="100%">
 						<mx:TextArea width="100%" height="100%" id="queryString">
 						    <mx:text>
 						    </mx:text>
 						</mx:TextArea>
 
 					<mx:LinkButton id="QueryNOW" label="SEARCH" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
-
 					</mx:HBox>
+
+					</mx:VBox>
 				</mx:target>
 			</mx:AddChild>
 			<mx:SetProperty target="{loginPanel}" name="title" value="Your Query"/>
