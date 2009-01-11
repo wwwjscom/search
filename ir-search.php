@@ -56,7 +56,8 @@ class Functions {
 				//echo $this->queryLucid($query);
 				break;
 			case "queryOracle":
-				echo $this->fileRead('/mnt/kwakdata/prymek/trec67combined/progs/res.out');
+				echo "<results><doc><snippet> in &lt;b&gt;Indiana&lt;/b&gt;, see us portrayed by the media as privileged people who never have to lift a finger for... year will call one of these people,' says Republican consultant &lt;b&gt;Jay&lt;/b&gt; Severin III. `Hire someone with</snippet><title>CONFERENCE REPORT ON S. 349, LOBBYING DISCLOSURE ACT OF 1994 (House - September 29, 1994)</title><docno> CR93H-16062 </docno></doc></results>";
+				//echo $this->fileRead('/mnt/kwakdata/prymek/trec67combined/progs/res.out');
 				break;
 			case "translateToConcept":
 				echo $this->translate_to_concept($this->getInput());

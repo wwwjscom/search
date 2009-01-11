@@ -339,6 +339,12 @@
 
 
 
+		public function resetEngineStatus():void {
+
+			oracleStatus.text = "Oracle Status: Searching..."
+			luceneStatus.text = "Lucene Status: Searching..."
+		}
+
 
 		/************************************
 		 *  All data for the tabbed query state
@@ -350,7 +356,7 @@
 		 * DATA FOR EACH ENTRY IN THE ARRAY BELOW!!! */
             [Bindable]
             public var queryResultsArray:Array = [
-								{label:"Lucid", data:"Loading results..."},
+								//{label:"Overview", data:"Loading results..."},
                 {label:"Oracle", data:"Loading results..."},
                 {label:"Lucene", data:"Loading results..."}
             ];
@@ -366,7 +372,8 @@
     			var targetComp:TabBar = TabBar(event.currentTarget);
 
 					var index:int = event.index;
-					resultsGrid.dataProvider = queryResultsArray[index]["data"];
+
+						resultsGrid.dataProvider = queryResultsArray[index]["data"];
     		}
 
 
@@ -388,16 +395,33 @@
           queryResultsArray[0]["data"] = event.result.doc;
 			}
 
+			import mx.controls.tabBarClasses.Tab
+
 	    public function handleOracleResults(event:ResultEvent):void
 			{
-          queryResultsArray[1]["data"] = event.result.doc;
+          queryResultsArray[0]["data"] = event.result.doc;
+					oracleStatus.text += "DONE";
+					redrawTabSuccess(0);
 			}	    
 
 			public function handleLuceneResults(event:ResultEvent):void
 			{
 					//resultsGrid.dataProvider = event.result.doc;
-          queryResultsArray[2]["data"] = event.result.doc;
+          queryResultsArray[1]["data"] = event.result.doc;
+					luceneStatus.text += "DONE";
+					redrawTabSuccess(1);
 					//debugArea.text = event.result.toString();
+
+			
+			}
+
+			private function redrawTabSuccess(index:Number):void {
+
+					var tab:Tab = queryResultsTab.getChildAt(index) as Tab;			  
+					tab.setStyle("fillColors", ["#edb000", "#e69500"]);
+					tab.setStyle("backgroundColor", "#e69500");
+					tab.setStyle("borderColor", "#e69500");
+					tab.setStyle("themeColor", "#edb000");	
 			}
 
 	        public function handleFault(event:FaultEvent):void
@@ -500,7 +524,7 @@
 	    </mx:request>
     </mx:HTTPService>
 
-   <mx:HTTPService result="handleOracleResults(event);" fault="handleFault(event);" id="queryOracle" resultFormat="text"
+   <mx:HTTPService result="handleOracleResults(event);" fault="handleFault(event);" id="queryOracle" resultFormat="e4x"
     	method="GET" url="ir-search.php" useProxy="false">
 	    <mx:request xmlns="">
 		<func>queryOracle</func>
@@ -591,21 +615,31 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 					width="100%"
 					>
 	
+					
 						<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
-               paddingLeft="10" paddingRight="10">
-							<mx:Label text="Show query for: " />
-							<mx:Button label="Lucid" click="showQuery(event)" />
-							<mx:Button label="Oracle" click="showQuery(event)" />
-							<mx:Button label="Lucene" click="showQuery(event)" />
+               paddingLeft="10" paddingRight="10" width="100%" height="90">
+							<mx:HBox>
+								<mx:Label text="Show query for: " />
+								<!--<mx:Button label="Lucid" click="showQuery(event)" />-->
+								<mx:Button label="Oracle" click="showQuery(event)" />
+								<mx:Button label="Lucene" click="showQuery(event)" />
+							</mx:HBox>				
+
+							<mx:VBox id="engineStatus" height="60" width="200">
+								<mx:Label id="luceneStatus" text="Lucene Status: Searching..." />
+								<mx:Label id="oracleStatus" text="Oracle Status: Searching..." />
+							</mx:VBox>
 						</mx:HBox>				
 
 						<mx:TabBar itemClick="clickEvt(event);" id="queryResultsTab">
 						    <mx:dataProvider>{queryResultsArray}</mx:dataProvider>
 						</mx:TabBar>
 			
+
 						<mx:DataGrid id="resultsGrid"
 							width="100%"
 							height="100%"
+							editable="false"
 							>
 							<mx:columns>
 								<mx:DataGridColumn headerText="DocNo"
@@ -621,7 +655,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 									dataField="snippet">
 									<mx:itemRenderer>
 										<mx:Component>
-											<mx:TextArea htmlText="{data.snippet}"/>
+											<mx:TextArea editable="false" htmlText="{data.snippet}"/>
 										</mx:Component>
 									</mx:itemRenderer>
 								</mx:DataGridColumn>
@@ -651,7 +685,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 								<mx:VBox>
 									<mx:Label text="Show query for: " />
 									<mx:HBox>
-										<mx:Button label="Lucid" click="showQuery(event)" />
+										<!--<mx:Button label="Lucid" click="showQuery(event)" />-->
 										<mx:Button label="Oracle" click="showQuery(event)" />
 										<mx:Button label="Lucene" click="showQuery(event)" />
 									</mx:HBox>
@@ -678,7 +712,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 							<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
 								 paddingLeft="10" paddingRight="10" height="100%">
 								<mx:VBox>
-									<mx:LinkButton id="QueryNOW" label="SEARCH" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
+									<mx:LinkButton id="QueryNOW" label="SEARCH" click="queryOracle.send();queryLucene.send();currentState='queryResults';resetEngineStatus()"/>
 								</mx:VBox>
 							</mx:HBox>
 
@@ -824,7 +858,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 		    <mx:Sequence targets="{[loginPanel, registerLink, spacer1]}">
 			<mx:RemoveChildAction/>
 			<mx:SetPropertyAction target="{loginPanel}" name="title"/>
-			<mx:Resize target="{loginPanel}" heightTo="100" widthTo="200"/>
+			<mx:Resize target="{loginPanel}" heightTo="100" widthTo="100"/>
 			<mx:AddChildAction/>
 		    </mx:Sequence>
 		</mx:Transition>
