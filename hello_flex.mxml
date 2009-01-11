@@ -2,7 +2,7 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 	layout="horizontal"
 	backgroundColor="black"
-	creationComplete="initApp();initCollections();getAllConcepts.send();currentState='showQuery'"
+	creationComplete="initApp();initCollections();getAllConcepts.send();getAllSavedQueries.send();currentState='showQuery';savedQueryName.setVisible(false)"
 	keyDown="keyHandler(event)"
 	>
 
@@ -330,8 +330,8 @@
 
 
 
-	   [Bindable]
-	   private var allConcepts:XMLList;
+	   [Bindable] private var allConcepts:XMLList;
+	   [Bindable] private var savedQueries:XMLList;
 	   private var queryResults:XMLList;
 
 	   public var queryResultsString:String = null;
@@ -374,6 +374,13 @@
             {
                 allConcepts = event.result.file as XMLList;
             }
+
+					 public function handleAllSavedQueries(event:ResultEvent):void
+            {
+                savedQueries = event.result.file as XMLList;
+            }
+
+
 
 	    /* Handles the query XML results */
 	    public function handleLucidResults(event:ResultEvent):void
@@ -419,9 +426,29 @@
 									</doc>
 								</results>;
 
+		public function handleSavedQuery(event:ResultEvent):void {
+
+			queryString.text = event.result.toString();
+		}
 		]]>
 	</mx:Script>
 
+   <mx:HTTPService result="handleSavedQuery(event);" fault="handleFault(event);" id="getSavedQuery" resultFormat="text"
+    	method="GET" url="ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>getSavedQuery</func>
+		<name>{savedQueryName.text}</name>
+		<!--<name>my_query</name>-->
+	    </mx:request>
+	</mx:HTTPService>
+
+   <mx:HTTPService result="handleAllSavedQueries(event);" fault="handleFault(event);" id="getAllSavedQueries" resultFormat="e4x"
+    	method="GET" url="ir-search.php" useProxy="false">
+	    <mx:request xmlns="">
+		<func>getAllSavedQueries</func>
+		<name>wwwjscom</name>
+	    </mx:request>
+	</mx:HTTPService>
 
    <mx:HTTPService result="handleTranslation(event);" fault="handleFault(event);" id="translateToConcept" resultFormat="text"
     	method="GET" url="ir-search.php" useProxy="false">
@@ -621,21 +648,38 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 
 							<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
 								 paddingLeft="10" paddingRight="10">
-								 <mx:Label text="Show query for: " />
-								 <mx:Button label="Lucid" click="showQuery(event)" />
-								 <mx:Button label="Oracle" click="showQuery(event)" />
-								 <mx:Button label="Lucene" click="showQuery(event)" />
-							 </mx:HBox>
-
-							<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
-								 paddingLeft="10" paddingRight="10">
-								<mx:Label text=" Add Concepts: " />
-								<mx:ComboBox id="conceptQuerySelector" dataProvider="{allConcepts}" width="150" change="queryString.text += '{' + conceptQuerySelector.selectedLabel + '} '"/>
+								<mx:VBox>
+									<mx:Label text="Show query for: " />
+									<mx:HBox>
+										<mx:Button label="Lucid" click="showQuery(event)" />
+										<mx:Button label="Oracle" click="showQuery(event)" />
+										<mx:Button label="Lucene" click="showQuery(event)" />
+									</mx:HBox>
+								</mx:VBox>
 							</mx:HBox>
 
 							<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
 								 paddingLeft="10" paddingRight="10">
-								<mx:LinkButton id="QueryNOW" label="SEARCH" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
+								<mx:VBox>
+									<mx:Label text=" Add Concepts: " />
+									<mx:ComboBox id="conceptQuerySelector" dataProvider="{allConcepts}" width="150" change="queryString.text += '{' + conceptQuerySelector.selectedLabel + '} '"/>
+								</mx:VBox>
+							</mx:HBox>
+
+							<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
+								 paddingLeft="10" paddingRight="10">
+								<mx:VBox>
+									<mx:Label text=" Saved Queries: " />
+									<mx:ComboBox id="savedQuerySelector" dataProvider="{savedQueries}" width="150" change="savedQueryName.text = savedQuerySelector.selectedLabel;getSavedQuery.send()"/>
+									<!--<mx:ComboBox id="savedQuerySelector" dataProvider="{savedQueries}" width="150" change="queryString.text = savedQueries[savedQuerySelector.selectedLabel].toString()"/>-->
+								</mx:VBox>
+							</mx:HBox>
+
+							<mx:HBox borderStyle="solid" paddingTop="10" paddingBottom="10" 
+								 paddingLeft="10" paddingRight="10" height="100%">
+								<mx:VBox>
+									<mx:LinkButton id="QueryNOW" label="SEARCH" click="queryLucid.send();queryOracle.send();queryLucene.send();currentState='queryResults'"/>
+								</mx:VBox>
 							</mx:HBox>
 
 						</mx:HBox>
@@ -860,6 +904,7 @@ To implement proximity operators, click on the "NEAR" button next to the new ter
 	</mx:VBox>
 
 	<mx:VBox id="col2">
+						<mx:Label id="savedQueryName" width="0" height="0" />
 						<mx:Label text="Debug Output:" width="0" height="0" />
 						<mx:TextArea id="debugArea" width="0" height="0" />
 	</mx:VBox>

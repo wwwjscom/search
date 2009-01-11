@@ -27,6 +27,14 @@ class Functions {
 				// In this case, name represents the persons username.
 				$this->getAllConcepts($this->name);
 				break;
+			case "getAllSavedQueries":
+				// In this case, name represents the username/filename.xml
+				$this->getAllSavedQueries($this->name);
+				break;
+			case "getSavedQuery":
+				// In this case, name represents the username/filename.xml
+				$this->getSavedQuery($this->name);
+				break;
 			case "getConceptData":
 				// In this case, name represents the username/filename.xml
 				$this->getConceptData($this->name);
@@ -326,6 +334,24 @@ class Functions {
 		$this->addConcept();
 	}
 
+
+
+	/* Returns the saved query. 
+	 *
+	 * Input: return::boolean -> should we return the data or echo it (echo is used when called by FLEX)
+	 */
+	public function getSavedQuery($filePathAndName, $return = false)
+	{
+		$myFile = "savedQueries/wwwjscom/" . strtolower($this->getName()) . ".xml";
+
+		if($return === true)
+			return $this->fileRead($myFile);
+		else
+			echo $this->fileRead($myFile);
+	}
+
+
+
 	/* Returns the concept data.  This allows the user to edit it.  However,
 	 * currently we display the XML to the user, we will need to write a funcion
 	 * which will convert the XML back to plain text.  Or can we just use the DOM
@@ -346,10 +372,10 @@ class Functions {
 	/* Returns all concepts that a given user has created over time.
 	 * This list is returned to flex and the filenames are displayed
 	 * to the user so that they can drag-drop them when building queries. */
-	public function getAllConcepts($name)
+	public function getAllSavedQueries($name)
 	{
 		//define the path as relative
-		$path = "concepts/".$name."";
+		$path = "savedQueries/" . $name;
 
 		//using the opendir function
 		$dir_handle = @opendir($path) or die("Unable to open $path");
@@ -358,6 +384,7 @@ class Functions {
 
 		print "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 		print "<files>";
+		print "<file>Select one...</file>";
 		//running the while loop
 		while ($file = readdir($dir_handle)) 
 		{
@@ -366,7 +393,41 @@ class Functions {
 				// Do nothing - don't want to display these.
 			} else {
 				$file = substr($file,0,strlen($file)-4);
-			   print "<file>$file</file>";
+				print "<file>$file</file>";
+			}
+		}
+		print "</files>";
+
+		//closing the directory
+		closedir($dir_handle);
+	}
+
+
+	/* Returns all concepts that a given user has created over time.
+	 * This list is returned to flex and the filenames are displayed
+	 * to the user so that they can drag-drop them when building queries. */
+	public function getAllConcepts($name)
+	{
+		//define the path as relative
+		$path = "concepts/" . $name;
+
+		//using the opendir function
+		$dir_handle = @opendir($path) or die("Unable to open $path");
+
+		//echo "Directory Listing of $path<br/>";
+
+		print "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
+		print "<files>";
+		print "<file>Select one...</file>";
+		//running the while loop
+		while ($file = readdir($dir_handle)) 
+		{
+			if($file == "." || $file == "..")
+			{
+				// Do nothing - don't want to display these.
+			} else {
+				$file = substr($file,0,strlen($file)-4);
+				print "<file>$file</file>";
 			}
 		}
 		print "</files>";
